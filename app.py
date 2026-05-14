@@ -163,7 +163,7 @@ def chat():
 
         # Emergency → direct to ER and stop
         if action2 == "emergency":
-            reply = (
+            reply = advice.get("reply") or (
                 "🚨 **This sounds like a medical emergency.**\n\n"
                 "Please call emergency services (112 / 911) immediately "
                 "or go to the nearest emergency room.\n\n"
@@ -175,50 +175,35 @@ def chat():
 
         # OTC → give advice and stop
         if action2 == "otc":
-            reply_parts = [advice.get("reply", "")]
-            if advice.get("otc_medications"):
-                meds = " | ".join(advice["otc_medications"])
-                reply_parts.append(f"💊 **Recommended:** {meds}")
-            reply_parts.append(
-                "_I am an AI assistant, not a doctor. "
+            reply = advice.get("reply", "")
+            reply += (
+                "\n\n_I am an AI assistant, not a doctor. "
                 "If symptoms persist or worsen, please see a doctor._"
             )
-            reply = "\n\n".join(reply_parts)
             sess["chat_history"].append({"role": "assistant", "content": reply})
             return jsonify({"stage": "otc", "reply": reply,
                             "proposal": None, "requires_confirm": False})
 
-        # Doctor needed → Agent 3
-        # ── Agent 3: Appointment Planner ─────────────────────────────────────
-        logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
-        plan_result = appointment_planner.plan(client, triage, advice, location)
-        proposal_text      = plan_result.get("proposal_text", "")
-        appointment_details = plan_result.get("appointment_details", {})
+        # Doctor needed → show Advisor’s full reply (which already includes the
+        # booking question) and surface Confirm / Decline buttons.
+        # The Appointment Planner runs AFTER the user confirms.
+        reply = advice.get("reply", "")
+        reply += (
+            "\n\n_I am an AI assistant, not a doctor._"
+        )
 
-        # Include diagnosis in advice text shown before the proposal
-        advice_reply = advice.get("reply", "")
-        if advice_reply:
-            advice_reply += (
-                "\n\n_I am an AI assistant, not a doctor. "
-                "A professional evaluation is recommended._"
-            )
-
-        # Persist pending action
+        # Persist context so the confirm endpoint can call the Planner + Executor
         sess["pending_action"] = {
-            "appointment_details": appointment_details,
             "triage": triage,
+            "advice": advice,
             "location": location,
         }
 
-        full_reply = advice_reply
-        if proposal_text:
-            full_reply += f"\n\n---\n\n📅 {proposal_text}"
-        sess["chat_history"].append({"role": "assistant", "content": full_reply})
-
+        sess["chat_history"].append({"role": "assistant", "content": reply})
         return jsonify({
-            "stage": "proposal",
-            "reply": advice_reply,
-            "proposal": proposal_text,
+            "stage": "doctor_needed",
+            "reply": reply,
+            "proposal": None,
             "requires_confirm": True,
         })
 
@@ -258,13 +243,31 @@ def confirm():
         sess["chat_history"].append({"role": "assistant", "content": reply})
         return jsonify({"stage": "declined", "reply": reply, "booking": None})
 
-    # ── Agent 4: Executor ────────────────────────────────────────────────────
+    # ── Agent 3: Appointment Planner (now that user has confirmed) ──────────
+    triage   = pending.get("triage", {})
+    advice   = pending.get("advice", {})
+    location = pending.get("location")
+
+    logger.info("[%s] Agent 3 — Appointment Planner (post-confirm)", session_id[:8])
+    try:
+        plan_result         = appointment_planner.plan(get_client(), triage, advice, location)
+        appointment_details = plan_result.get("appointment_details", {})
+    except Exception as exc:
+        logger.warning("[%s] Appointment Planner failed, using fallback: %s", session_id[:8], exc)
+        appointment_details = {
+            "type": "gp",
+            "specialist_type": advice.get("specialist_type", "General Practitioner"),
+            "urgency": advice.get("urgency", "this_week"),
+            "reason": advice.get("diagnosis", "Medical evaluation needed"),
+        }
+
+    # ── Agent 4: Executor ──────────────────────────────────────────────────
     logger.info("[%s] Agent 4 — Executor", session_id[:8])
     try:
         get_client()  # validate API key is present
         result = executor.execute_booking(
-            appointment_details=pending["appointment_details"],
-            patient_context=pending.get("triage", {}),
+            appointment_details=appointment_details,
+            patient_context=triage,
         )
         sess["pending_action"] = None
         reply = result.get("message", "✅ Appointment booked!")

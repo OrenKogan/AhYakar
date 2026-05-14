@@ -579,10 +579,9 @@ async function sendMessage() {
 
         allDotsDone();
 
-        if (data.requires_confirm && data.proposal) {
-            // Show appointment proposal with Confirm/Decline
-            appendProposalCard(
-                data.proposal,
+        if (data.requires_confirm) {
+            // Show Confirm/Decline buttons — the advisor's reply already contains the question
+            appendConfirmButtons(
                 () => handleConfirm(true),
                 () => handleConfirm(false),
             );
@@ -599,14 +598,45 @@ async function sendMessage() {
 }
 
 // ── Confirm/Decline ───────────────────────────────────────────────────────────
+function appendConfirmButtons(onConfirm, onDecline) {
+    const row = document.createElement('div');
+    row.className = 'row bot';
+
+    const card = document.createElement('div');
+    card.className = 'confirm-card';
+    card.id = 'confirmCard';
+
+    const actions = document.createElement('div');
+    actions.className = 'confirm-actions';
+
+    const yesBtn = document.createElement('button');
+    yesBtn.className = 'confirm-btn yes';
+    yesBtn.id = 'confirmYes';
+    yesBtn.textContent = '📅 Yes, find me a doctor';
+    yesBtn.onclick = () => { disableConfirmCard(); onConfirm(); };
+
+    const noBtn = document.createElement('button');
+    noBtn.className = 'confirm-btn no';
+    noBtn.id = 'confirmNo';
+    noBtn.textContent = 'No thanks';
+    noBtn.onclick = () => { disableConfirmCard(); onDecline(); };
+
+    actions.appendChild(yesBtn);
+    actions.appendChild(noBtn);
+    card.appendChild(actions);
+    row.appendChild(card);
+    chatBox.appendChild(row);
+    scrollBottom();
+}
+
 async function handleConfirm(confirmed) {
-    const label = confirmed ? '✅ Yes, book it' : 'No thanks';
+    const label = confirmed ? '📅 Yes, find me a doctor' : 'No thanks';
     appendUserMessage(label);
-    lockInput(confirmed ? 'Booking appointment…' : 'Processing…');
+    lockInput(confirmed ? 'Finding a doctor…' : 'Processing…');
 
     if (confirmed) {
-        setDot(3, 'active');
-        headerStatus.textContent = 'Booking appointment…';
+        setDot(2, 'active');
+        headerStatus.textContent = 'Finding nearest doctor…';
     }
 
     try {
@@ -617,7 +647,7 @@ async function handleConfirm(confirmed) {
         });
         const data = await res.json();
 
-        if (confirmed) setDot(3, 'done');
+        if (confirmed) { setDot(2, 'done'); setDot(3, 'done'); }
 
         if (data.error) {
             appendBotMessage('⚠️ ' + data.error);
