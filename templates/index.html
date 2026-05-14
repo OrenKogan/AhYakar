@@ -737,6 +737,15 @@
             switchView('chatView', element);
         }
 
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         function clearAttachment() {
             pendingFile = null;
             document.getElementById('attachmentBar').style.display = 'none';
@@ -894,46 +903,38 @@
             document.getElementById('attachBtn').disabled = true;
 
             let finalMessage = text;
-            let fileInfo = null;
+            let imageBase64 = null;
 
-            // 1. Upload file if pending
+            // 1. Process file if pending
             if (pendingFile) {
-                const formData = new FormData();
-                formData.append('file', pendingFile);
-                formData.append('userId', userProfile.id);
-                formData.append('sessionId', currentSessionId);
-
                 try {
-                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
-                    const data = await res.json();
-                    if (data.success) {
-                        fileInfo = data;
-                        let fileHtml = '';
-                        const isImage = pendingFile.type.startsWith('image/');
-
-                        if (isImage) {
-                            fileHtml = `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
-                                <img src="${data.url}" style="max-width: 100%; display: block; max-height: 300px; object-fit: cover;">
-                                <div style="padding: 8px 12px; background: rgba(0,0,0,0.2); font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
-                                    <i class="fa-solid fa-image"></i> ${pendingFile.name}
-                                </div>
-                            </div>`;
-                        } else {
-                            fileHtml = `<div class="file-attachment" style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); transition: background 0.2s; cursor: pointer;" onclick="window.open('${data.url}', '_blank')">
-                                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
-                                    <i class="fa-solid fa-file-medical"></i>
-                                </div>
-                                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    <div style="font-weight: 600;">${pendingFile.name}</div>
-                                    <div style="font-size: 0.7rem; opacity: 0.7;">Click to view document</div>
-                                </div>
-                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; opacity: 0.5;"></i>
-                            </div>`;
-                        }
+                    const isImage = pendingFile.type.startsWith('image/');
+                    if (isImage) {
+                        imageBase64 = await fileToBase64(pendingFile);
+                        const dataUrl = `data:${pendingFile.type};base64,${imageBase64}`;
+                        
+                        const fileHtml = `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <img src="${dataUrl}" style="max-width: 100%; display: block; max-height: 300px; object-fit: cover;">
+                            <div style="padding: 8px 12px; background: rgba(0,0,0,0.2); font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-image"></i> ${pendingFile.name}
+                            </div>
+                        </div>`;
+                        finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + fileHtml;
+                    } else {
+                        // Non-image files can still be displayed but not analyzed by vision model
+                        const fileHtml = `<div class="file-attachment" style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="fa-solid fa-file-medical"></i>
+                            </div>
+                            <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <div style="font-weight: 600;">${pendingFile.name}</div>
+                                <div style="font-size: 0.7rem; opacity: 0.7;">Document attached</div>
+                            </div>
+                        </div>`;
                         finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + fileHtml;
                     }
                 } catch (err) {
-                    console.error("Upload failed", err);
+                    console.error("File processing failed", err);
                 }
             }
 
@@ -969,7 +970,8 @@
                         message: text,
                         userId: userId,
                         sessionId: currentSessionId,
-                        location: userLocation
+                        location: userLocation,
+                        imageData: imageBase64
                     })
                 });
 

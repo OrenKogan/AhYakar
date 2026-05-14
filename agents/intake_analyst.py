@@ -30,20 +30,23 @@ DECISION CRITERIA:
     or anything that could require OTC medication or a doctor visit.
 - "no_symptoms"  — the message contains no health complaint (greeting, general question, etc.)
 
+VISION INSTRUCTIONS:
+If the user provides an image, analyze it for visible signs (rash, swelling, discoloration, wounds). Describe these signs in your reasoning and include them in the 'symptoms' list.
+
 You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 {
   "has_symptoms": true or false,
   "action": "home_remedy | escalate | no_symptoms",
   "home_remedy_advice": "Short friendly advice if home_remedy, else null.",
-  "symptoms": ["list of symptoms mentioned OR INFERRED from the user's answer to a previous question (e.g. if user says 'Yes' to 'Do you have a fever?', add 'fever' to this list)"],
+  "symptoms": ["list of symptoms mentioned or VISIBLY IDENTIFIED in images"],
   "duration": "how long, or 'unknown'",
   "relevant_history": "history mentioned, or 'none'",
-  "reasoning": "one brief sentence"
+  "reasoning": "one brief sentence describing findings (including visual findings if an image was provided)"
 }
 """
 
 
-def analyze(client: OpenAI, user_message: str, chat_history: list) -> dict:
+def analyze(client: OpenAI, user_message: str, chat_history: list, image_data: str = None) -> dict:
     """
     Run the Intake Analyst agent.
 
@@ -51,6 +54,7 @@ def analyze(client: OpenAI, user_message: str, chat_history: list) -> dict:
         client       : OpenAI-compatible client pointed at OpenRouter.
         user_message : The latest user message.
         chat_history : Full conversation history (list of role/content dicts).
+        image_data   : Optional base64-encoded image data.
 
     Returns:
         A triage dict with 'action' set to 'home_remedy', 'escalate', or 'no_symptoms'.
@@ -58,10 +62,17 @@ def analyze(client: OpenAI, user_message: str, chat_history: list) -> dict:
     # Include up to the last 6 history messages for context (3 exchanges)
     context = chat_history[-6:] if len(chat_history) > 6 else chat_history
 
+    user_content = [{"type": "text", "text": f"Patient's message: {user_message}"}]
+    if image_data:
+        user_content.append({
+            "type": "image_url",
+            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
+        })
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         *context,
-        {"role": "user", "content": f"Patient's message: {user_message}"},
+        {"role": "user", "content": user_content},
     ]
 
     response = client.chat.completions.create(

@@ -22,20 +22,16 @@ load_dotenv()
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from openai import OpenAI
 
-from agents import intake_analyst, medical_advisor, appointment_planner, executor
+from agents import intake_analyst, medical_advisor, appointment_planner, executor, clinical_diagnostician
 
 import uuid
+import base64
 from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ── OpenRouter client (lazy-initialized on first request) ──────────────────
 _client: OpenAI | None = None
@@ -144,9 +140,10 @@ def chat():
     user_id = (data.get("userId") or "").strip()
     session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
     location   = data.get("location")
+    image_data = data.get("imageData") # Base64 string from client
 
-    if not user_message:
-        return jsonify({"error": "message is required"}), 400
+    if not user_message and not image_data:
+        return jsonify({"error": "message or image is required"}), 400
     if not session_id:
         return jsonify({"error": "sessionId is required"}), 400
 
@@ -174,8 +171,8 @@ def chat():
                 sess["title"] = user_message[:50] + "..."
 
         # ── Agent 1: Intake Analyst ──────────────────────────────────────────
-        logger.info("[%s] Agent 1 — Intake Analyst", session_id[:8])
-        triage = intake_analyst.analyze(client, user_message, sess["chat_history"])
+        logger.info("[%s] Agent 1 — Intake Analyst (Vision: %s)", session_id[:8], bool(image_data))
+        triage = intake_analyst.analyze(client, user_message, sess["chat_history"], image_data)
         sess["last_triage"] = triage
         
         # Merge memory into patient_profile
@@ -217,10 +214,13 @@ def chat():
                 "thoughts": { "intake": triage }
             })
 
-        # ── Agent 2: Medical Advisor ─────────────────────────────────────────
-        logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
-        # Pass the accumulated profile instead of just the latest triage
-        advice = medical_advisor.advise(client, profile, sess["chat_history"])
+        # ── Agent 2: Clinical Diagnostician ──────────────────────────────────
+        logger.info("[%s] Agent 2 — Clinical Diagnostician", session_id[:8])
+        assessment = clinical_diagnostician.analyze(client, profile, sess["chat_history"], image_data)
+
+        # ── Agent 3: Medical Advisor ─────────────────────────────────────────
+        logger.info("[%s] Agent 3 — Medical Advisor", session_id[:8])
+        advice = medical_advisor.advise(client, profile, assessment, sess["chat_history"])
         action2 = advice.get("action", "doctor_needed")
 
         # Save medications to user profile
@@ -259,8 +259,8 @@ def chat():
             sess["chat_history"].append({"role": "assistant", "content": reply})
             return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
 
-        # Doctor needed → Agent 3: Appointment Planner
-        logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
+        # Doctor needed → Agent 4: Appointment Planner
+        logger.info("[%s] Agent 4 — Appointment Planner", session_id[:8])
         plan_result = appointment_planner.plan(client, triage, advice, location)
         proposal_text = plan_result.get("proposal_text", "")
         
@@ -382,31 +382,6 @@ def medications():
     return jsonify({"medications": udata.get("medications", [])})
 
 
-
-
-@app.route("/api/upload", methods=["POST"])
-def upload_file():
-    """Handle file uploads."""
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    
-    if file:
-        filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-        return jsonify({
-            "success": True, 
-            "filename": filename,
-            "path": unique_filename,
-            "url": f"/uploads/{unique_filename}"
-        })
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route("/api/reset", methods=["POST"])
