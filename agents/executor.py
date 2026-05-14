@@ -28,7 +28,7 @@ Expected API contract (POST to BOOKING_API_URL):
 """
 
 import asyncio
-from browser_use import Agent, BrowserProfile
+from browser_use import Agent, BrowserProfile, BrowserSession
 from browser_use.llm.openai.chat import ChatOpenAI  # Use browser-use's own OpenAI wrapper (compatible ainvoke)
 import logging
 from datetime import datetime, timezone
@@ -58,27 +58,39 @@ async def run_browser_agent(specialist_type: str, urgency: str) -> str:
         f"8. DO NOT complete the task until you actually see the confirmation screen. Once confirmed, extract the doctor's name, the clinic location, and the booked time slot, and return them."
     )
 
-    # Re-apply the WSL display flags to fix the transparent window bug
+    # WSL display flags + speed tuning: minimal waits between actions
     profile = BrowserProfile(
         args=[
             '--disable-gpu',
             '--no-sandbox',
             '--disable-dev-shm-usage',
             '--disable-software-rasterizer'
-        ]
+        ],
+        minimum_wait_page_load_time=0.3,          # Was ~1s default — cut to 300ms
+        wait_for_network_idle_page_load_time=1.0,  # Was ~3s default — cut to 1s
+        wait_between_actions=0.3,                  # Was ~1s default — cut to 300ms
     )
+
+    browser_session = BrowserSession(browser_profile=profile)
 
     agent = Agent(
         task=task_prompt,
         llm=llm,
-        browser_profile=profile
+        browser=browser_session,
+        flash_mode=True,           # Strips planning overhead — much faster action loop
+        max_actions_per_step=5,    # Chain more clicks per LLM call
+        use_vision=True,
     )
-    
-    result = await agent.run()
-    final_output = result.final_result() if result else None
-    if not final_output:
-        raise RuntimeError("Agent completed without a confirmed result. Booking may not have succeeded.")
-    return final_output
+
+    try:
+        result = await agent.run()
+        final_output = result.final_result() if result else None
+        if not final_output:
+            raise RuntimeError("Agent completed without a confirmed result. Booking may not have succeeded.")
+        return final_output
+    finally:
+        # Always close the browser window when done (success or failure)
+        await browser_session.stop()
 
 def execute_booking(appointment_details: dict, patient_context: dict | None = None) -> dict:
     """
