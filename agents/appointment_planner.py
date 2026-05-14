@@ -26,7 +26,7 @@ You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
   "proposal_text": "One sentence: visit is needed. Then: 'Would you like me to help you schedule an appointment to the [Specialist]?'",
   "appointment_details": {
     "type": "gp | specialist",
-    "specialist_type": "e.g. General Practitioner, Cardiologist",
+    "specialist_type": "e.g. Family Doctor, Cardiologist",
     "urgency": "immediately | within_24h | this_week | whenever",
     "reason": "diagnosis in 1 sentence"
   }
@@ -71,7 +71,7 @@ def plan(client: OpenAI, triage: dict, advice: dict, location: dict | None = Non
     try:
         return parse_json_response(raw)
     except (json.JSONDecodeError, ValueError):
-        specialist = advice.get("specialist_type", "General Practitioner")
+        specialist = advice.get("specialist_type", "Family Doctor")
         urgency = advice.get("urgency", "this_week")
         return {
             "proposal_text": (
