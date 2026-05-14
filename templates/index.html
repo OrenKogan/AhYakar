@@ -662,6 +662,7 @@
 
             // Save user profile
             userProfile = { name, id, kupa };
+            localStorage.setItem('ahyakar_user', JSON.stringify(userProfile));
             
             // Update sidebar display
             document.getElementById('userNameDisplay').innerHTML = `<i class="fa-regular fa-circle-user"></i> ${name}`;
@@ -802,6 +803,35 @@
         document.getElementById('onboardingModal').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 submitDetails();
+            }
+        });
+
+        // Check for saved user on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedProfile = localStorage.getItem('ahyakar_user');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+                
+                // Update sidebar
+                document.getElementById('userNameDisplay').innerHTML = `<i class="fa-regular fa-circle-user"></i> ${userProfile.name}`;
+                
+                // Hide modal without animation for immediate access
+                const modal = document.getElementById('onboardingModal');
+                modal.style.transition = 'none';
+                modal.classList.add('hidden');
+                
+                // Enable inputs
+                inputWrapper.classList.remove('disabled-state');
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                document.querySelector('.action-btn[title="Attach file (demo)"]').disabled = false;
+                userInput.placeholder = "Describe your symptoms or ask a question...";
+                
+                // Send "Welcome back" message
+                setTimeout(() => {
+                    const greeting = `Welcome back, ${userProfile.name}! I am the AhYakar Medical Assistant. How can I help you today?`;
+                    appendMessage(greeting, 'ai');
+                }, 400);
             }
         });
     </script>
