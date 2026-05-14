@@ -666,19 +666,14 @@
             <!-- Attachment Preview Bar -->
             <div id="attachmentBar"
                 style="display: none; padding: 12px 24px; background: var(--sidebar-bg); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-                <div
-                    style="background: rgba(13, 148, 136, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(13, 148, 136, 0.2);">
-                    <i class="fa-solid fa-file-medical"></i>
-                    <span id="attachedFileName" style="font-weight: 600;">file.pdf</span>
-                    <i class="fa-solid fa-circle-xmark" style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s;"
-                        onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7"
-                        onclick="clearAttachment()"></i>
+                <div id="attachmentList" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <!-- Attachment chips will be injected here -->
                 </div>
             </div>
 
             <div class="input-container">
                 <div class="input-wrapper disabled-state" id="inputWrapper">
-                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)" multiple>
                     <button class="action-btn" id="attachBtn" title="Attach file"
                         onclick="document.getElementById('fileInput').click()" disabled>
                         <i class="fa-solid fa-paperclip"></i>
@@ -722,14 +717,25 @@
 
         let userProfile = null;
         let userLocation = null;
-        let pendingFile = null;
+        let pendingFiles = [];
         let currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2, 8);
 
         function startNewConsultation(element) {
             currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2, 8);
             chatBox.innerHTML = '';
 
+            // Reset input states
+            userInput.value = '';
+            clearAttachment();
+
             if (userProfile) {
+                // Re-enable inputs if user is logged in
+                inputWrapper.classList.remove('disabled-state');
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                document.getElementById('attachBtn').disabled = false;
+                userInput.placeholder = "Describe your symptoms or ask a question...";
+
                 const greeting = `Welcome, ${userProfile.name}! I am the AhYakar Medical Assistant. How can I help you today?`;
                 appendMessage(greeting, 'ai');
             }
@@ -747,9 +753,55 @@
         }
 
         function clearAttachment() {
-            pendingFile = null;
-            document.getElementById('attachmentBar').style.display = 'none';
+            pendingFiles = [];
+            renderAttachments();
             document.getElementById('fileInput').value = '';
+        }
+
+        function removeAttachment(index) {
+            pendingFiles.splice(index, 1);
+            renderAttachments();
+            if (pendingFiles.length === 0) {
+                document.getElementById('fileInput').value = '';
+            }
+        }
+
+        function renderAttachments() {
+            const bar = document.getElementById('attachmentBar');
+            const list = document.getElementById('attachmentList');
+            
+            if (pendingFiles.length === 0) {
+                bar.style.display = 'none';
+                userInput.placeholder = "Describe your symptoms or ask a question...";
+                return;
+            }
+            
+            bar.style.display = 'block';
+            list.innerHTML = '';
+            
+            pendingFiles.forEach((file, index) => {
+                const chip = document.createElement('div');
+                chip.style.background = 'rgba(13, 148, 136, 0.1)';
+                chip.style.color = 'var(--primary)';
+                chip.style.padding = '6px 12px';
+                chip.style.border = '1px solid rgba(13, 148, 136, 0.2)';
+                chip.style.borderRadius = '10px';
+                chip.style.fontSize = '0.85rem';
+                chip.style.display = 'flex';
+                chip.style.alignItems = 'center';
+                chip.style.gap = '10px';
+                
+                chip.innerHTML = `
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span style="font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>
+                    <i class="fa-solid fa-circle-xmark" style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7"
+                        onclick="removeAttachment(${index})"></i>
+                `;
+                list.appendChild(chip);
+            });
+            
+            userInput.placeholder = "Add a message about these files...";
         }
 
         // ── Geolocation ───────────────────────────────────────────────────────────
@@ -894,7 +946,7 @@
 
         async function sendMessage() {
             const text = userInput.value.trim();
-            if (!text && !pendingFile) return;
+            if (!text && pendingFiles.length === 0) return;
             if (userInput.disabled) return;
 
             // Disable input briefly while sending
@@ -905,34 +957,50 @@
             let finalMessage = text;
             let imageBase64 = null;
 
-            // 1. Process file if pending
-            if (pendingFile) {
+            // 1. Process files if pending
+            if (pendingFiles.length > 0) {
+                const imagePromises = [];
+                const nonImageFiles = [];
+                
+                for (const file of pendingFiles) {
+                    if (file.type.startsWith('image/')) {
+                        imagePromises.push(fileToBase64(file).then(base64 => ({ file, base64 })));
+                    } else {
+                        nonImageFiles.push(file);
+                    }
+                }
+
                 try {
-                    const isImage = pendingFile.type.startsWith('image/');
-                    if (isImage) {
-                        imageBase64 = await fileToBase64(pendingFile);
-                        const dataUrl = `data:${pendingFile.type};base64,${imageBase64}`;
-                        
-                        const fileHtml = `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                    const results = await Promise.all(imagePromises);
+                    imageBase64 = results.map(r => r.base64); // Send as array
+                    
+                    let visualHtml = "";
+                    
+                    // Render images in user bubble
+                    results.forEach(res => {
+                        const dataUrl = `data:${res.file.type};base64,${res.base64}`;
+                        visualHtml += `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                             <img src="${dataUrl}" style="max-width: 100%; display: block; max-height: 300px; object-fit: cover;">
                             <div style="padding: 8px 12px; background: rgba(0,0,0,0.2); font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-image"></i> ${pendingFile.name}
+                                <i class="fa-solid fa-image"></i> ${res.file.name}
                             </div>
                         </div>`;
-                        finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + fileHtml;
-                    } else {
-                        // Non-image files can still be displayed but not analyzed by vision model
-                        const fileHtml = `<div class="file-attachment" style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1);">
+                    });
+
+                    // Render non-image files
+                    nonImageFiles.forEach(file => {
+                        visualHtml += `<div class="file-attachment" style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1);">
                             <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
                                 <i class="fa-solid fa-file-medical"></i>
                             </div>
                             <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                <div style="font-weight: 600;">${pendingFile.name}</div>
+                                <div style="font-weight: 600;">${file.name}</div>
                                 <div style="font-size: 0.7rem; opacity: 0.7;">Document attached</div>
                             </div>
                         </div>`;
-                        finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + fileHtml;
-                    }
+                    });
+
+                    finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + visualHtml;
                 } catch (err) {
                     console.error("File processing failed", err);
                 }
@@ -1076,6 +1144,7 @@
             } finally {
                 userInput.disabled = false;
                 sendBtn.disabled = false;
+                document.getElementById('attachBtn').disabled = false;
                 userInput.focus();
             }
         }
@@ -1366,15 +1435,18 @@
         function handleFileSelect(e) {
             const files = e.target.files;
             if (files.length > 0) {
-                queueFile(files[0]);
+                for (let i = 0; i < files.length; i++) {
+                    queueFile(files[i]);
+                }
             }
         }
 
         function queueFile(file) {
-            pendingFile = file;
-            document.getElementById('attachedFileName').textContent = file.name;
-            document.getElementById('attachmentBar').style.display = 'block';
-            userInput.placeholder = "Add a message about this file...";
+            // Prevent duplicates (optional but good)
+            if (pendingFiles.some(f => f.name === file.name && f.size === file.size)) return;
+            
+            pendingFiles.push(file);
+            renderAttachments();
             userInput.focus();
         }
 
@@ -1415,7 +1487,9 @@
             const dt = e.dataTransfer;
             const files = dt.files;
             if (files.length > 0) {
-                queueFile(files[0]);
+                for (let i = 0; i < files.length; i++) {
+                    queueFile(files[i]);
+                }
             }
         }
     </script>

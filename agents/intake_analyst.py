@@ -46,7 +46,7 @@ You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 """
 
 
-def analyze(client: OpenAI, user_message: str, chat_history: list, image_data: str = None) -> dict:
+def analyze(client: OpenAI, user_message: str, chat_history: list, image_data: str | list[str] = None) -> dict:
     """
     Run the Intake Analyst agent.
 
@@ -54,7 +54,7 @@ def analyze(client: OpenAI, user_message: str, chat_history: list, image_data: s
         client       : OpenAI-compatible client pointed at OpenRouter.
         user_message : The latest user message.
         chat_history : Full conversation history (list of role/content dicts).
-        image_data   : Optional base64-encoded image data.
+        image_data   : Optional base64-encoded image data or list of data.
 
     Returns:
         A triage dict with 'action' set to 'home_remedy', 'escalate', or 'no_symptoms'.
@@ -64,10 +64,12 @@ def analyze(client: OpenAI, user_message: str, chat_history: list, image_data: s
 
     user_content = [{"type": "text", "text": f"Patient's message: {user_message}"}]
     if image_data:
-        user_content.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
-        })
+        images = [image_data] if isinstance(image_data, str) else image_data
+        for img in images:
+            user_content.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{img}"}
+            })
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},

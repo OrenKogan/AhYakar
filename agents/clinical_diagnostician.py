@@ -35,7 +35,7 @@ You MUST respond with ONLY a valid JSON object:
 }
 """
 
-def analyze(client: OpenAI, triage: dict, chat_history: list, image_data: str = None) -> dict:
+def analyze(client: OpenAI, triage: dict, chat_history: list, image_data: str | list[str] = None) -> dict:
     """
     Run the Clinical Diagnostician.
     """
@@ -50,10 +50,12 @@ def analyze(client: OpenAI, triage: dict, chat_history: list, image_data: str = 
     
     user_content = [{"type": "text", "text": user_text}]
     if image_data:
-        user_content.append({
-            "type": "image_url",
-            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}
-        })
+        images = [image_data] if isinstance(image_data, str) else image_data
+        for img in images:
+            user_content.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{img}"}
+            })
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
