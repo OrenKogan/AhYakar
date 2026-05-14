@@ -1,53 +1,67 @@
 import os
+from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 
+app = Flask(__name__)
+
+# Initialize OpenRouter client
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY"),
 )
 
-# Define the specialized medical persona
-# We include strict instructions on OTC medications and disclaimers.
-messages = [
+# Global conversation history (acts as memory while the server runs)
+chat_history = [
     {
         "role": "system", 
         "content": (
-            "You are a specialized Medical Assistant. Your goal is to provide helpful, "
-            "evidence-based advice for minor health concerns. "
-            "\n\nRules:\n"
-            "1. If a symptom sounds serious (e.g., chest pain, difficulty breathing), "
-            "immediately advise the user to seek emergency medical care.\n"
-            "2. Suggest only Over-The-Counter (OTC) medications that do not require "
-            "a prescription. Always advise the user to read the label and check for allergies.\n"
-            "3. Provide non-pharmacological suggestions (e.g., rest, hydration, ice packs).\n"
-            "4. Start or end every interaction with a clear disclaimer that you are an "
-            "AI and not a doctor."
+            "You are a specialized Medical Assistant. "
+            "1. If a symptom sounds serious, advise seeking emergency care immediately. "
+            "2. Suggest ONLY Over-The-Counter (OTC) medications. "
+            "3. State clearly that you are an AI and not a doctor."
         )
     }
 ]
 
-print("Medical Assistant initialized. How can I help you today?\n")
+@app.route('/')
+def home():
+    """Serves the web GUI."""
+    return render_template('index.html')
 
-while True:
-    user_input = input("User: ")
-    if user_input.lower() in ["exit", "quit"]:
-        break
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    """Handles the chat logic and AI generation."""
+    data = request.json
+    user_message = data.get('message')
+    
+    if not user_message:
+        return jsonify({"error": "Message is required"}), 400
 
-    messages.append({"role": "user", "content": user_input})
+    # Add user message to history
+    chat_history.append({"role": "user", "content": user_message})
 
     try:
+        # Call the AI model
         response = client.chat.completions.create(
             model="google/gemini-2.5-flash", 
-            messages=messages,
+            messages=chat_history,
             extra_headers={
-                "HTTP-Referer": "http://localhost:3000",
+                "HTTP-Referer": "http://localhost:5000",
                 "X-OpenRouter-Title": "AhYakar Medical Bot",
-            }
+            },
+            temperature=0.2 # Low temperature for factual medical advice
         )
 
-        reply = response.choices[0].message.content
-        print(f"\nAssistant: {reply}\n")
-        messages.append({"role": "assistant", "content": reply})
+        ai_reply = response.choices[0].message.content
+        
+        # Add AI reply to history
+        chat_history.append({"role": "assistant", "content": ai_reply})
+
+        return jsonify({"reply": ai_reply})
 
     except Exception as e:
-        print(f"Error: {e}")
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    # Run the server on port 5000
+    app.run(debug=True, port=5000)
