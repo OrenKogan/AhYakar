@@ -22,9 +22,10 @@ load_dotenv()
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from openai import OpenAI
 
-from agents import intake_analyst, medical_advisor, appointment_planner, executor
+from agents import intake_analyst, medical_advisor, appointment_planner, executor, clinical_diagnostician
 
 import uuid
+import base64
 from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.INFO)
@@ -55,6 +56,15 @@ def get_client() -> OpenAI:
             api_key=api_key,
         )
     return _client
+
+def encode_image_to_base64(path: str) -> str:
+    """Read a local file and return its base64 representation."""
+    try:
+        with open(path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+    except Exception as e:
+        logger.error("Failed to encode image: %s", e)
+        return None
 
 # ── In-memory session store ───────────────────────────────────────────────────
 # Structure: { session_id: { chat_history, pending_action, last_triage } }
@@ -106,11 +116,21 @@ def chat():
     user_id = (data.get("userId") or "").strip()
     session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
     location   = data.get("location")
+    image_url  = data.get("imageUrl") # e.g. "/uploads/xyz.jpg"
 
-    if not user_message:
-        return jsonify({"error": "message is required"}), 400
+    if not user_message and not image_url:
+        return jsonify({"error": "message or image is required"}), 400
     if not session_id:
         return jsonify({"error": "sessionId is required"}), 400
+
+    # Handle Image Data
+    image_data = None
+    if image_url:
+        # Extract filename from URL (e.g. "/uploads/abc.jpg" -> "abc.jpg")
+        filename = os.path.basename(image_url)
+        local_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(local_path):
+            image_data = encode_image_to_base64(local_path)
 
     sess = get_session(session_id, user_id)
     sess["chat_history"].append({"role": "user", "content": user_message})
@@ -136,8 +156,8 @@ def chat():
                 sess["title"] = user_message[:50] + "..."
 
         # ── Agent 1: Intake Analyst ──────────────────────────────────────────
-        logger.info("[%s] Agent 1 — Intake Analyst", session_id[:8])
-        triage = intake_analyst.analyze(client, user_message, sess["chat_history"])
+        logger.info("[%s] Agent 1 — Intake Analyst (Vision: %s)", session_id[:8], bool(image_data))
+        triage = intake_analyst.analyze(client, user_message, sess["chat_history"], image_data)
         sess["last_triage"] = triage
         
         # Merge memory into patient_profile
@@ -179,10 +199,13 @@ def chat():
                 "thoughts": { "intake": triage }
             })
 
-        # ── Agent 2: Medical Advisor ─────────────────────────────────────────
-        logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
-        # Pass the accumulated profile instead of just the latest triage
-        advice = medical_advisor.advise(client, profile, sess["chat_history"])
+        # ── Agent 2: Clinical Diagnostician ──────────────────────────────────
+        logger.info("[%s] Agent 2 — Clinical Diagnostician", session_id[:8])
+        assessment = clinical_diagnostician.analyze(client, profile, sess["chat_history"], image_data)
+
+        # ── Agent 3: Medical Advisor ─────────────────────────────────────────
+        logger.info("[%s] Agent 3 — Medical Advisor", session_id[:8])
+        advice = medical_advisor.advise(client, profile, assessment, sess["chat_history"])
         action2 = advice.get("action", "doctor_needed")
 
         # Save medications to user profile
@@ -221,8 +244,8 @@ def chat():
             sess["chat_history"].append({"role": "assistant", "content": reply})
             return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
 
-        # Doctor needed → Agent 3: Appointment Planner
-        logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
+        # Doctor needed → Agent 4: Appointment Planner
+        logger.info("[%s] Agent 4 — Appointment Planner", session_id[:8])
         plan_result = appointment_planner.plan(client, triage, advice, location)
         proposal_text = plan_result.get("proposal_text", "")
         
