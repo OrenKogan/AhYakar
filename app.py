@@ -59,9 +59,9 @@ def get_client() -> OpenAI:
 # ── In-memory session store ───────────────────────────────────────────────────
 # Structure: { session_id: { chat_history, pending_action, last_triage } }
 sessions: dict[str, dict] = {}
+user_sessions: dict[str, list[str]] = {}
 
-
-def get_session(session_id: str) -> dict:
+def get_session(session_id: str, user_id: str = None) -> dict:
     """Return (creating if needed) the session state for the given ID."""
     if session_id not in sessions:
         sessions[session_id] = {
@@ -69,6 +69,11 @@ def get_session(session_id: str) -> dict:
             "pending_action": None,
             "last_triage": None,
         }
+        if user_id:
+            if user_id not in user_sessions:
+                user_sessions[user_id] = []
+            if session_id not in user_sessions[user_id]:
+                user_sessions[user_id].append(session_id)
     return sessions[session_id]
 
 
@@ -86,20 +91,37 @@ def chat():
     data = request.json or {}
     user_message = (data.get("message") or "").strip()
     
-    # Support both session_id (old) and userId (new frontend)
-    session_id = (data.get("userId") or data.get("session_id") or "").strip()
+    user_id = (data.get("userId") or "").strip()
+    session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
     location   = data.get("location")
 
     if not user_message:
         return jsonify({"error": "message is required"}), 400
     if not session_id:
-        return jsonify({"error": "userId/session_id is required"}), 400
+        return jsonify({"error": "sessionId is required"}), 400
 
-    sess = get_session(session_id)
+    sess = get_session(session_id, user_id)
     sess["chat_history"].append({"role": "user", "content": user_message})
 
     try:
         client = get_client()
+
+        # Generate a headline title if it doesn't exist
+        if "title" not in sess and user_message:
+            try:
+                resp = client.chat.completions.create(
+                    model="google/gemini-2.5-flash",
+                    messages=[{"role": "user", "content": f"Provide a very short 2-5 word headline summarizing this medical complaint: '{user_message}'. Output only the headline."}],
+                    max_tokens=20,
+                    extra_headers={
+                        "HTTP-Referer": "http://localhost:5000",
+                        "X-OpenRouter-Title": "AhYakar",
+                    }
+                )
+                sess["title"] = resp.choices[0].message.content.strip().replace('"', '')
+            except Exception as e:
+                logger.warning("Failed to generate title: %s", e)
+                sess["title"] = user_message[:50] + "..."
 
         # ── Agent 1: Intake Analyst ──────────────────────────────────────────
         logger.info("[%s] Agent 1 — Intake Analyst", session_id[:8])
@@ -189,13 +211,14 @@ def chat():
 def confirm():
     """Confirmation endpoint for booking."""
     data = request.json or {}
-    session_id = (data.get("userId") or data.get("session_id") or "").strip()
+    user_id = (data.get("userId") or "").strip()
+    session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
     confirmed  = bool(data.get("confirmed", False))
 
     if not session_id:
-        return jsonify({"error": "userId is required"}), 400
+        return jsonify({"error": "sessionId is required"}), 400
 
-    sess = get_session(session_id)
+    sess = get_session(session_id, user_id)
     pending = sess.get("pending_action")
 
     if not pending:
@@ -220,12 +243,40 @@ def confirm():
 
 @app.route("/api/history", methods=["GET"])
 def history():
-    """Return chat history for a user."""
+    """Return chat history for a user, grouped by sessions."""
     user_id = request.args.get("userId")
     if not user_id:
         return jsonify({"error": "userId required"}), 400
-    sess = get_session(user_id)
-    return jsonify({"history": sess["chat_history"]})
+        
+    user_history = []
+    session_ids = user_sessions.get(user_id, [])
+    
+    for sid in session_ids:
+        sess = sessions.get(sid)
+        if sess and sess["chat_history"]:
+            summary = sess.get("title")
+            if not summary:
+                # Fallback Find first user message for the summary
+                summary = "New Consultation"
+                for msg in sess["chat_history"]:
+                    if msg["role"] == "user":
+                        summary = msg["content"]
+                        break
+                
+                # Truncate summary if too long
+                if len(summary) > 60:
+                    summary = summary[:57] + "..."
+                
+            user_history.append({
+                "sessionId": sid,
+                "summary": summary,
+                "messages": sess["chat_history"]
+            })
+            
+    # Reverse so newest are first
+    user_history.reverse()
+    
+    return jsonify({"history": user_history})
 
 
 @app.route("/api/medications", methods=["GET", "POST"])

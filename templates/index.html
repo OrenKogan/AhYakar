@@ -629,7 +629,7 @@
             AhYakar
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchView('chatView', this)">
+            <div class="nav-item active" onclick="startNewConsultation(this)">
                 <i class="fa-solid fa-message"></i> New Consultation
             </div>
             <div class="nav-item" onclick="switchView('historyView', this); loadHistory();">
@@ -707,6 +707,19 @@
         let userProfile = null;
         let userLocation = null;
         let pendingFile = null;
+        let currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2, 8);
+
+        function startNewConsultation(element) {
+            currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2, 8);
+            chatBox.innerHTML = '';
+            
+            if (userProfile) {
+                const greeting = `Welcome, ${userProfile.name}! I am the AhYakar Medical Assistant. How can I help you today?`;
+                appendMessage(greeting, 'ai');
+            }
+            
+            switchView('chatView', element);
+        }
 
         function clearAttachment() {
             pendingFile = null;
@@ -872,6 +885,7 @@
                 const formData = new FormData();
                 formData.append('file', pendingFile);
                 formData.append('userId', userProfile.id);
+                formData.append('sessionId', currentSessionId);
 
                 try {
                     const res = await fetch('/api/upload', { method: 'POST', body: formData });
@@ -938,6 +952,7 @@
                     body: JSON.stringify({ 
                         message: text, 
                         userId: userId,
+                        sessionId: currentSessionId,
                         location: userLocation 
                     })
                 });
@@ -1026,7 +1041,7 @@
                 const res = await fetch('/api/confirm', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userProfile.id, confirmed }),
+                    body: JSON.stringify({ userId: userProfile.id, sessionId: currentSessionId, confirmed }),
                 });
                 const data = await res.json();
                 
@@ -1172,14 +1187,86 @@
                 const data = await res.json();
                 container.innerHTML = '';
                 if (data.history && data.history.length > 0) {
-                    data.history.forEach(msg => {
-                        const div = document.createElement('div');
-                        div.style.padding = '16px';
-                        div.style.borderRadius = '12px';
-                        div.style.background = msg.role === 'user' ? 'var(--user-msg-bg)' : 'var(--ai-msg-bg)';
-                        div.style.color = msg.role === 'user' ? 'white' : 'var(--text-main)';
-                        div.innerHTML = `<strong>${msg.role === 'user' ? 'You' : 'AI'}:</strong><br><div style="margin-top: 8px;">${msg.content.replace(/\n/g, '<br>')}</div>`;
-                        container.appendChild(div);
+                    data.history.forEach(session => {
+                        const sessionDiv = document.createElement('div');
+                        sessionDiv.style.background = 'var(--sidebar-bg)';
+                        sessionDiv.style.border = '1px solid var(--border-color)';
+                        sessionDiv.style.borderRadius = '12px';
+                        sessionDiv.style.overflow = 'hidden';
+                        sessionDiv.style.marginBottom = '16px';
+                        
+                        const headerDiv = document.createElement('div');
+                        headerDiv.style.padding = '16px';
+                        headerDiv.style.cursor = 'pointer';
+                        headerDiv.style.display = 'flex';
+                        headerDiv.style.justifyContent = 'space-between';
+                        headerDiv.style.alignItems = 'center';
+                        headerDiv.style.background = 'rgba(13, 148, 136, 0.05)';
+                        headerDiv.innerHTML = `
+                            <div style="font-weight: 600; color: var(--text-main); flex: 1;">
+                                <i class="fa-solid fa-comments" style="color: var(--primary); margin-right: 8px;"></i>
+                                ${session.summary}
+                            </div>
+                            <i class="fa-solid fa-chevron-down" style="color: var(--text-muted);"></i>
+                        `;
+                        
+                        const messagesDiv = document.createElement('div');
+                        messagesDiv.className = 'history-messages-container';
+                        messagesDiv.style.display = 'none';
+                        messagesDiv.style.padding = '16px';
+                        messagesDiv.style.borderTop = '1px solid var(--border-color)';
+                        messagesDiv.style.display = 'flex';
+                        messagesDiv.style.flexDirection = 'column';
+                        messagesDiv.style.gap = '24px';
+                        
+                        session.messages.forEach(msg => {
+                            const wrapper = document.createElement('div');
+                            wrapper.className = `message-wrapper ${msg.role === 'user' ? 'user' : 'ai'}`;
+                            wrapper.style.opacity = '1';
+                            wrapper.style.transform = 'translateY(0)';
+                            wrapper.style.animation = 'none'; // skip fade-in animation
+                            
+                            const avatarHtml = msg.role === 'user'
+                                ? `<div class="avatar user-avatar"><i class="fa-solid fa-user"></i></div>`
+                                : `<div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>`;
+
+                            const msgClass = msg.role === 'user' ? 'user-msg' : 'ai-msg';
+                            
+                            let content = msg.content;
+                            if(typeof content === 'string') {
+                                content = content.replace(/\\n/g, '<br>');
+                            }
+
+                            wrapper.innerHTML = `
+                                ${avatarHtml}
+                                <div class="message ${msgClass}">${content}</div>
+                            `;
+                            messagesDiv.appendChild(wrapper);
+                        });
+                        
+                        headerDiv.onclick = () => {
+                            const isHidden = messagesDiv.style.display === 'none';
+                            
+                            // Close all other accordions
+                            document.querySelectorAll('.history-messages-container').forEach(el => {
+                                el.style.display = 'none';
+                            });
+                            document.querySelectorAll('.fa-chevron-down').forEach(el => {
+                                el.style.transform = 'rotate(0deg)';
+                            });
+
+                            if (isHidden) {
+                                messagesDiv.style.display = 'flex';
+                                headerDiv.querySelector('.fa-chevron-down').style.transform = 'rotate(180deg)';
+                            }
+                        };
+                        
+                        // Start hidden
+                        messagesDiv.style.display = 'none';
+                        
+                        sessionDiv.appendChild(headerDiv);
+                        sessionDiv.appendChild(messagesDiv);
+                        container.appendChild(sessionDiv);
                     });
                 } else {
                     container.innerHTML = '<div style="color: var(--text-muted);">No history found.</div>';
