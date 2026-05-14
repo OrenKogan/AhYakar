@@ -20,8 +20,12 @@ asking whether to proceed with booking.
 import json
 from openai import OpenAI
 from .utils import parse_json_response
+from .rag_engine import retrieve_medical_context
 
 SYSTEM_PROMPT = """You are a senior Medical Advisor AI. Answer directly, concisely, and without evasion.
+
+YOUR KNOWLEDGE SOURCE:
+You are provided with "Verified Medical Reference Data" for the most relevant conditions. You MUST prioritize the OTC dosages and self-care steps found in this data if it matches the patient's symptoms.
 
 RULES:
 - Direct answers only. No filler.
@@ -63,12 +67,17 @@ def advise(client: OpenAI, triage: dict) -> dict:
         An advice dict. The 'reply' field is the full patient-facing message,
         including the booking question when action is 'doctor_needed'.
     """
+    symptoms = triage.get('symptoms', [])
+    medical_context = retrieve_medical_context(symptoms)
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {
             "role": "user",
             "content": (
-                f"Symptoms: {', '.join(triage.get('symptoms', []))}\n"
+                f"{medical_context}\n\n"
+                f"Patient Case:\n"
+                f"Symptoms: {', '.join(symptoms)}\n"
                 f"Duration: {triage.get('duration', 'unknown')}\n"
                 f"Medical history / notes: {triage.get('relevant_history', 'none')}"
             ),
