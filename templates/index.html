@@ -664,18 +664,23 @@
             </div>
 
             <!-- Attachment Preview Bar -->
-            <div id="attachmentBar" style="display: none; padding: 12px 24px; background: var(--sidebar-bg); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-                <div style="background: rgba(13, 148, 136, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(13, 148, 136, 0.2);">
+            <div id="attachmentBar"
+                style="display: none; padding: 12px 24px; background: var(--sidebar-bg); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                <div
+                    style="background: rgba(13, 148, 136, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(13, 148, 136, 0.2);">
                     <i class="fa-solid fa-file-medical"></i>
                     <span id="attachedFileName" style="font-weight: 600;">file.pdf</span>
-                    <i class="fa-solid fa-circle-xmark" style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7" onclick="clearAttachment()"></i>
+                    <i class="fa-solid fa-circle-xmark" style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s;"
+                        onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7"
+                        onclick="clearAttachment()"></i>
                 </div>
             </div>
 
             <div class="input-container">
                 <div class="input-wrapper disabled-state" id="inputWrapper">
                     <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
-                    <button class="action-btn" id="attachBtn" title="Attach file" onclick="document.getElementById('fileInput').click()" disabled>
+                    <button class="action-btn" id="attachBtn" title="Attach file"
+                        onclick="document.getElementById('fileInput').click()" disabled>
                         <i class="fa-solid fa-paperclip"></i>
                     </button>
                     <input type="text" id="userInput" placeholder="Please complete registration first..."
@@ -723,12 +728,12 @@
         function startNewConsultation(element) {
             currentSessionId = Date.now().toString() + Math.random().toString(36).substring(2, 8);
             chatBox.innerHTML = '';
-            
+
             if (userProfile) {
                 const greeting = `Welcome, ${userProfile.name}! I am the AhYakar Medical Assistant. How can I help you today?`;
                 appendMessage(greeting, 'ai');
             }
-            
+
             switchView('chatView', element);
         }
 
@@ -905,7 +910,7 @@
                         fileInfo = data;
                         let fileHtml = '';
                         const isImage = pendingFile.type.startsWith('image/');
-                        
+
                         if (isImage) {
                             fileHtml = `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                                 <img src="${data.url}" style="max-width: 100%; display: block; max-height: 300px; object-fit: cover;">
@@ -948,7 +953,7 @@
                 { ms: 8000, text: "Preparing final response..." }
             ];
 
-            const timers = statusIntervals.map(step => 
+            const timers = statusIntervals.map(step =>
                 setTimeout(() => {
                     const statusEl = document.getElementById(`${typingId}-status`);
                     if (statusEl) statusEl.textContent = step.text;
@@ -960,11 +965,11 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: text, 
+                    body: JSON.stringify({
+                        message: text,
                         userId: userId,
                         sessionId: currentSessionId,
-                        location: userLocation 
+                        location: userLocation
                     })
                 });
 
@@ -972,7 +977,7 @@
                 timers.forEach(t => clearTimeout(t));
 
                 const data = await response.json();
-                
+
                 // 4. Remove typing indicator and show response
                 document.getElementById(typingId).remove();
 
@@ -1045,7 +1050,7 @@
         async function handleConfirm(confirmed) {
             const label = confirmed ? '📅 Yes, find me a doctor' : 'No thanks';
             appendMessage(label, 'user');
-            
+
             const typingId = appendTypingIndicator();
 
             try {
@@ -1055,7 +1060,7 @@
                     body: JSON.stringify({ userId: userProfile.id, sessionId: currentSessionId, confirmed }),
                 });
                 const data = await res.json();
-                
+
                 document.getElementById(typingId).remove();
 
                 if (data.error) {
@@ -1164,10 +1169,39 @@
             }
         });
 
+        async function newConsultation() {
+            if (!userProfile) return;
+
+            // Call API to reset session on backend
+            try {
+                await fetch('/api/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id })
+                });
+            } catch (e) {
+                console.error("Failed to reset session:", e);
+            }
+
+            // Clear UI
+            chatMessages.innerHTML = '';
+            const greeting = `Starting a fresh consultation. How can I help you today, ${userProfile.name}?`;
+            appendMessage(greeting, 'ai');
+
+            // Ensure we are in chat view
+            switchView('chatView');
+        }
+
         function switchView(viewId, element) {
             // Update active class on nav
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (element) element.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // If called programmatically, find the correct nav item
+                const navItem = Array.from(document.querySelectorAll('.nav-item')).find(el => el.textContent.includes(viewId === 'chatView' ? 'New Consultation' : ''));
+                if (navItem) navItem.classList.add('active');
+            }
 
             // Hide all views
             document.querySelectorAll('.view-container').forEach(el => {
@@ -1205,7 +1239,7 @@
                         sessionDiv.style.borderRadius = '12px';
                         sessionDiv.style.overflow = 'hidden';
                         sessionDiv.style.marginBottom = '16px';
-                        
+
                         const headerDiv = document.createElement('div');
                         headerDiv.style.padding = '16px';
                         headerDiv.style.cursor = 'pointer';
@@ -1220,7 +1254,7 @@
                             </div>
                             <i class="fa-solid fa-chevron-down" style="color: var(--text-muted);"></i>
                         `;
-                        
+
                         const messagesDiv = document.createElement('div');
                         messagesDiv.className = 'history-messages-container';
                         messagesDiv.style.display = 'none';
@@ -1229,22 +1263,22 @@
                         messagesDiv.style.display = 'flex';
                         messagesDiv.style.flexDirection = 'column';
                         messagesDiv.style.gap = '24px';
-                        
+
                         session.messages.forEach(msg => {
                             const wrapper = document.createElement('div');
                             wrapper.className = `message-wrapper ${msg.role === 'user' ? 'user' : 'ai'}`;
                             wrapper.style.opacity = '1';
                             wrapper.style.transform = 'translateY(0)';
                             wrapper.style.animation = 'none'; // skip fade-in animation
-                            
+
                             const avatarHtml = msg.role === 'user'
                                 ? `<div class="avatar user-avatar"><i class="fa-solid fa-user"></i></div>`
                                 : `<div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>`;
 
                             const msgClass = msg.role === 'user' ? 'user-msg' : 'ai-msg';
-                            
+
                             let content = msg.content;
-                            if(typeof content === 'string') {
+                            if (typeof content === 'string') {
                                 content = content.replace(/\\n/g, '<br>');
                             }
 
@@ -1254,10 +1288,10 @@
                             `;
                             messagesDiv.appendChild(wrapper);
                         });
-                        
+
                         headerDiv.onclick = () => {
                             const isHidden = messagesDiv.style.display === 'none';
-                            
+
                             // Close all other accordions
                             document.querySelectorAll('.history-messages-container').forEach(el => {
                                 el.style.display = 'none';
@@ -1271,10 +1305,10 @@
                                 headerDiv.querySelector('.fa-chevron-down').style.transform = 'rotate(180deg)';
                             }
                         };
-                        
+
                         // Start hidden
                         messagesDiv.style.display = 'none';
-                        
+
                         sessionDiv.appendChild(headerDiv);
                         sessionDiv.appendChild(messagesDiv);
                         container.appendChild(sessionDiv);
@@ -1299,7 +1333,7 @@
                     data.medications.forEach(medItem => {
                         const medText = typeof medItem === 'string' ? medItem : medItem.text;
                         const medDate = typeof medItem === 'string' ? 'Recent' : medItem.date;
-                        
+
                         const div = document.createElement('div');
                         div.style.background = 'var(--sidebar-bg)';
                         div.style.border = '1px solid var(--border-color)';

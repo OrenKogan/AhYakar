@@ -1,0 +1,129 @@
+[
+  {
+    "condition": "Common Cold",
+    "symptoms": ["runny nose", "sore throat", "cough", "congestion", "mild fever", "sneezing"],
+    "otc_recommendations": [
+      "Acetaminophen (Tylenol) or Ibuprofen (Advil/Motrin) for aches and fever",
+      "Decongestants like Pseudoephedrine (Sudafed) for nasal stuffiness (consult pharmacist)",
+      "Cough suppressants with Dextromethorphan for dry cough",
+      "Saline nasal drops or spray"
+    ],
+    "self_care": "Drink plenty of fluids, rest, use a humidifier, and gargle with salt water.",
+    "red_flags": ["Symptoms lasting more than 10 days", "High fever (>39°C/103°F)", "Difficulty breathing", "Severe sinus pain"],
+    "source": "MedlinePlus / Mayo Clinic"
+  },
+  {
+    "condition": "Influenza (Flu)",
+    "symptoms": ["sudden fever", "chills", "muscle aches", "fatigue", "dry cough", "headache", "sore throat"],
+    "otc_recommendations": [
+      "Acetaminophen or Ibuprofen for fever and body aches",
+      "Stay hydrated with water, broth, or electrolyte drinks",
+      "Avoid aspirin in children (risk of Reye's syndrome)"
+    ],
+    "self_care": "Strict bed rest, isolation to prevent spread, and high fluid intake.",
+    "red_flags": ["Difficulty breathing or shortness of breath", "Chest pain", "Confusion", "Seizures", "Worsening of chronic medical conditions"],
+    "source": "CDC / MedlinePlus"
+  },
+  {
+    "condition": "COVID-19",
+    "symptoms": ["fever", "cough", "shortness of breath", "loss of taste or smell", "fatigue", "muscle aches", "sore throat", "nausea", "diarrhea"],
+    "otc_recommendations": [
+      "Acetaminophen or Ibuprofen for fever and pain relief",
+      "Cough medicine to soothe throat and lungs",
+      "Hydration and rest"
+    ],
+    "self_care": "Isolate from others, monitor oxygen levels if possible, and rest.",
+    "red_flags": ["Trouble breathing", "Persistent pain or pressure in the chest", "New confusion", "Inability to wake or stay awake", "Pale, gray, or blue-colored skin/lips"],
+    "source": "CDC / WHO"
+  },
+  {
+    "condition": "Strep Throat (Bacterial)",
+    "symptoms": ["sudden sore throat", "pain when swallowing", "fever", "swollen lymph nodes", "white patches on tonsils", "red spots on roof of mouth"],
+    "otc_recommendations": [
+      "Acetaminophen or Ibuprofen for pain and fever",
+      "Salt water gargle (1/4 tsp salt in 8oz warm water)",
+      "Throat lozenges or anesthetic sprays"
+    ],
+    "self_care": "Eat soft foods, drink cold liquids, and rest your voice.",
+    "red_flags": ["Difficulty breathing", "Inability to swallow or excessive drooling", "Inability to open mouth fully", "Signs of dehydration"],
+    "requires_doctor": true,
+    "specialist": "General Practitioner / ENT",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Urinary Tract Infection (UTI)",
+    "symptoms": ["burning during urination", "frequent urge to urinate", "cloudy or bloody urine", "strong-smelling urine", "pelvic pain"],
+    "otc_recommendations": [
+      "Phenazopyridine (AZO) for temporary relief of urinary pain and burning",
+      "Increase water intake significantly to flush bacteria"
+    ],
+    "self_care": "Avoid caffeine, alcohol, and spicy foods which can irritate the bladder.",
+    "red_flags": ["Back or side (flank) pain", "Fever and chills", "Nausea or vomiting", "Blood in urine"],
+    "requires_doctor": true,
+    "specialist": "General Practitioner / Urologist",
+    "source": "Mayo Clinic"
+  },
+  {
+    "condition": "Ear Infection (Otitis Media)",
+    "symptoms": ["ear pain", "fullness in ear", "fluid drainage", "muffled hearing", "fever", "irritability in children"],
+    "otc_recommendations": [
+      "Acetaminophen or Ibuprofen for pain relief",
+      "Warm compress against the affected ear"
+    ],
+    "self_care": "Keep the ear dry and rest.",
+    "red_flags": ["Severe pain that suddenly stops (may indicate ruptured eardrum)", "High fever", "Dizziness", "Swelling behind the ear"],
+    "requires_doctor": true,
+    "specialist": "ENT / Pediatrician",
+    "source": "MedlinePlus"
+  },
+  {
+    "condition": "Concussion (Mild TBI)",
+    "symptoms": ["headache", "dizziness", "confusion", "nausea", "sensitivity to light", "foggy feeling", "memory loss"],
+    "otc_recommendations": [
+      "Physical and cognitive rest are primary",
+      "Acetaminophen for headache (avoid Ibuprofen/Aspirin initially due to bleeding risk)"
+    ],
+    "self_care": "Avoid screens (phones/TV), limit mental exertion, and sleep.",
+    "red_flags": ["Loss of consciousness", "Worsening headache", "Repeated vomiting", "Slurred speech", "Seizures", "Weakness or numbness"],
+    "requires_doctor": true,
+    "urgency": "immediately",
+    "source": "Mayo Clinic"
+  },
+  {
+    "condition": "Food Poisoning",
+    "symptoms": ["nausea", "vomiting", "diarrhea", "stomach cramps", "fever", "weakness"],
+    "otc_recommendations": [
+      "Oral Rehydration Salts (Pedialyte/Gatorade)",
+      "Bismuth subsalicylate (Pepto-Bismol) for nausea/diarrhea",
+      "Loperamide (Imodium) ONLY if no fever or bloody stools"
+    ],
+    "self_care": "Sip small amounts of clear liquids, avoid solid food until vomiting stops.",
+    "red_flags": ["Bloody diarrhea", "High fever (>39°C/102°F)", "Frequent vomiting (cannot keep liquids down)", "Severe dehydration"],
+    "source": "CDC / MedlinePlus"
+  },
+  {
+    "condition": "Asthma Attack",
+    "symptoms": ["shortness of breath", "wheezing", "chest tightness", "coughing especially at night"],
+    "otc_recommendations": [
+      "No OTC substitute for rescue inhalers",
+      "Follow your prescribed Asthma Action Plan"
+    ],
+    "self_care": "Sit upright, stay calm, and move away from triggers.",
+    "red_flags": ["Rescue inhaler doesn't help", "Blue lips or fingernails", "Severe difficulty breathing", "Difficulty speaking"],
+    "requires_doctor": true,
+    "urgency": "immediately",
+    "source": "Asthma and Allergy Foundation of America"
+  },
+  {
+    "condition": "Allergic Reaction",
+    "symptoms": ["hives", "itching", "runny nose", "watery eyes", "rash", "sneezing"],
+    "otc_recommendations": [
+      "Antihistamines (Diphenhydramine/Claritin/Zyrtec)",
+      "Hydrocortisone cream for skin rashes"
+    ],
+    "self_care": "Identify and remove the allergen source, use cool compresses.",
+    "red_flags": ["Difficulty breathing or wheezing", "Swelling of lips, tongue, or throat", "Dizziness or fainting", "Rapid pulse"],
+    "urgency": "immediately",
+    "source": "MedlinePlus"
+  }
+]

@@ -34,11 +34,11 @@ You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 {
   "has_symptoms": true or false,
   "action": "home_remedy | escalate | no_symptoms",
-  "home_remedy_advice": "If action is home_remedy: a warm, short (2-3 sentences) friendly message listing the specific home remedies best suited for this patient's symptoms. Otherwise: null.",
-  "symptoms": ["list of symptoms mentioned, or empty array"],
-  "duration": "how long the patient has had symptoms, or 'unknown'",
-  "relevant_history": "any medical history or medications the patient mentioned, or 'none'",
-  "reasoning": "one brief sentence explaining your decision"
+  "home_remedy_advice": "Short friendly advice if home_remedy, else null.",
+  "symptoms": ["list of symptoms mentioned OR INFERRED from the user's answer to a previous question (e.g. if user says 'Yes' to 'Do you have a fever?', add 'fever' to this list)"],
+  "duration": "how long, or 'unknown'",
+  "relevant_history": "history mentioned, or 'none'",
+  "reasoning": "one brief sentence"
 }
 """
 
