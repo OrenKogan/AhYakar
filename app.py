@@ -56,11 +56,49 @@ def get_client() -> OpenAI:
         )
     return _client
 
-# ── In-memory session store ───────────────────────────────────────────────────
+import json
+
+APP_DATA_DIR = 'app_data'
+if not os.path.exists(APP_DATA_DIR):
+    os.makedirs(APP_DATA_DIR)
+DB_FILE = os.path.join(APP_DATA_DIR, 'db.json')
+
+# ── Persistent session store ───────────────────────────────────────────────────
 # Structure: { session_id: { chat_history, pending_action, last_triage } }
 sessions: dict[str, dict] = {}
 user_sessions: dict[str, list[str]] = {}
 user_data: dict[str, dict] = {}
+
+def load_state():
+    global sessions, user_sessions, user_data
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                sessions = data.get('sessions', {})
+                user_sessions = data.get('user_sessions', {})
+                user_data = data.get('user_data', {})
+        except Exception as e:
+            logger.error("Failed to load state: %s", e)
+
+def save_state():
+    try:
+        with open(DB_FILE, 'w', encoding='utf-8') as f:
+            json.dump({
+                'sessions': sessions,
+                'user_sessions': user_sessions,
+                'user_data': user_data
+            }, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error("Failed to save state: %s", e)
+
+load_state()
+
+@app.after_request
+def auto_save(response):
+    if request.path.startswith('/api/'):
+        save_state()
+    return response
 
 def get_user_data(user_id: str) -> dict:
     if user_id not in user_data:
