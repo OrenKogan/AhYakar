@@ -635,6 +635,9 @@
             <div class="nav-item" onclick="switchView('historyView', this); loadHistory();">
                 <i class="fa-solid fa-clock-rotate-left"></i> History
             </div>
+            <div class="nav-item" onclick="switchView('medicationsView', this); loadMedications();">
+                <i class="fa-solid fa-pills"></i> Medications
+            </div>
             <div style="flex-grow: 1;"></div>
             <div class="nav-item" id="userNameDisplay">
                 <i class="fa-regular fa-circle-user"></i> Guest User
@@ -690,6 +693,14 @@
             <h2 style="margin-bottom: 20px;">Consultation History</h2>
             <div id="historyContent" style="display: flex; flex-direction: column; gap: 16px;">
                 <div style="color: var(--text-muted);">Loading history...</div>
+            </div>
+        </div>
+
+        <div id="medicationsView" class="view-container"
+            style="display: none; padding: 32px; overflow-y: auto; height: calc(100vh - 70px);">
+            <h2 style="margin-bottom: 20px;">Prescribed Medications</h2>
+            <div id="medicationsContent" style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="color: var(--text-muted);">Loading medications...</div>
             </div>
         </div>
 
@@ -1273,6 +1284,46 @@
                 }
             } catch (e) {
                 container.innerHTML = '<div style="color: #ef4444;">Error loading history.</div>';
+            }
+        }
+
+        async function loadMedications() {
+            if (!userProfile) return;
+            const container = document.getElementById('medicationsContent');
+            container.innerHTML = '<div style="color: var(--text-muted);">Loading medications...</div>';
+            try {
+                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
+                const data = await res.json();
+                container.innerHTML = '';
+                if (data.medications && data.medications.length > 0) {
+                    data.medications.forEach(medItem => {
+                        const medText = typeof medItem === 'string' ? medItem : medItem.text;
+                        const medDate = typeof medItem === 'string' ? 'Recent' : medItem.date;
+                        
+                        const div = document.createElement('div');
+                        div.style.background = 'var(--sidebar-bg)';
+                        div.style.border = '1px solid var(--border-color)';
+                        div.style.borderRadius = '12px';
+                        div.style.padding = '16px';
+                        div.style.display = 'flex';
+                        div.style.alignItems = 'center';
+                        div.style.gap = '16px';
+                        div.innerHTML = `
+                            <div style="font-size: 2rem; color: var(--primary);">
+                                <i class="fa-solid fa-capsules"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; font-size: 1rem; color: var(--text-main);">${medText}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;"><i class="fa-regular fa-calendar"></i> Recommended on: ${medDate}</div>
+                            </div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<div style="color: var(--text-muted);">No medications recommended yet.</div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="color: #ef4444;">Error loading medications.</div>';
             }
         }
         // ── File Upload & Drag-and-Drop ──────────────────────────────────────────

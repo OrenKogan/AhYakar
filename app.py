@@ -60,6 +60,12 @@ def get_client() -> OpenAI:
 # Structure: { session_id: { chat_history, pending_action, last_triage } }
 sessions: dict[str, dict] = {}
 user_sessions: dict[str, list[str]] = {}
+user_data: dict[str, dict] = {}
+
+def get_user_data(user_id: str) -> dict:
+    if user_id not in user_data:
+        user_data[user_id] = {"medications": []}
+    return user_data[user_id]
 
 def get_session(session_id: str, user_id: str = None) -> dict:
     """Return (creating if needed) the session state for the given ID."""
@@ -155,6 +161,17 @@ def chat():
         logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
         advice = medical_advisor.advise(client, triage)
         action2 = advice.get("action", "doctor_needed")
+
+        # Save medications to user profile
+        import datetime
+        meds = advice.get("otc_medications", [])
+        if meds and user_id:
+            udata = get_user_data(user_id)
+            current_date = datetime.datetime.now().strftime("%B %d, %Y")
+            for med in meds:
+                existing_texts = [m.get("text") if isinstance(m, dict) else m for m in udata["medications"]]
+                if med not in existing_texts:
+                    udata["medications"].append({"text": med, "date": current_date})
 
         if action2 == "emergency":
             reply = advice.get("reply") or "🚨 **Medical Emergency.** Call 101/911 immediately."
@@ -288,15 +305,15 @@ def medications():
         meds = data.get("medications", [])
         if not user_id:
             return jsonify({"error": "userId required"}), 400
-        sess = get_session(user_id)
-        sess["medications"] = meds
+        udata = get_user_data(user_id)
+        udata["medications"] = meds
         return jsonify({"success": True})
     
     user_id = request.args.get("userId")
     if not user_id:
         return jsonify({"error": "userId required"}), 400
-    sess = get_session(user_id)
-    return jsonify({"medications": sess.get("medications", [])})
+    udata = get_user_data(user_id)
+    return jsonify({"medications": udata.get("medications", [])})
 
 
 
