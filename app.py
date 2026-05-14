@@ -19,15 +19,23 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 from openai import OpenAI
 
 from agents import intake_analyst, medical_advisor, appointment_planner, executor
+
+import uuid
+from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = 'uploads'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # ── OpenRouter client (lazy-initialized on first request) ──────────────────
 _client: OpenAI | None = None
@@ -103,13 +111,23 @@ def chat():
         if action1 == "no_symptoms":
             reply = "I'm here to help with your health! Describe any symptoms you have."
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
+            return jsonify({
+                "stage": "chat", 
+                "reply": reply, 
+                "requires_confirm": False,
+                "thoughts": { "intake": triage }
+            })
 
         if action1 == "home_remedy":
             reply = triage.get("home_remedy_advice") or "This sounds like it can be managed at home with rest and fluids."
             reply += "\n\n_I am an AI assistant, not a doctor._"
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "home_remedy", "reply": reply, "requires_confirm": False})
+            return jsonify({
+                "stage": "home_remedy", 
+                "reply": reply, 
+                "requires_confirm": False,
+                "thoughts": { "intake": triage }
+            })
 
         # ── Agent 2: Medical Advisor ─────────────────────────────────────────
         logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
@@ -119,12 +137,22 @@ def chat():
         if action2 == "emergency":
             reply = advice.get("reply") or "🚨 **Medical Emergency.** Call 101/911 immediately."
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "emergency", "reply": reply, "requires_confirm": False})
+            return jsonify({
+                "stage": "emergency", 
+                "reply": reply, 
+                "requires_confirm": False,
+                "thoughts": { "intake": triage, "advisor": advice }
+            })
 
         if action2 == "otc":
             reply = advice.get("reply", "")
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "otc", "reply": reply, "requires_confirm": False})
+            return jsonify({
+                "stage": "otc", 
+                "reply": reply, 
+                "requires_confirm": False,
+                "thoughts": { "intake": triage, "advisor": advice }
+            })
 
         # Doctor needed → Agent 3: Appointment Planner
         logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
@@ -145,6 +173,11 @@ def chat():
             "reply": advisor_reply,
             "proposal": proposal_text,
             "requires_confirm": True,
+            "thoughts": {
+                "intake": triage,
+                "advisor": advice,
+                "planner": plan_result
+            }
         })
 
     except Exception as exc:
@@ -213,6 +246,33 @@ def medications():
         return jsonify({"error": "userId required"}), 400
     sess = get_session(user_id)
     return jsonify({"medications": sess.get("medications", [])})
+
+
+
+
+@app.route("/api/upload", methods=["POST"])
+def upload_file():
+    """Handle file uploads."""
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    if file:
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4().hex}_{filename}"
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+        return jsonify({
+            "success": True, 
+            "filename": filename,
+            "path": unique_filename,
+            "url": f"/uploads/{unique_filename}"
+        })
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 if __name__ == "__main__":

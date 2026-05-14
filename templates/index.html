@@ -188,6 +188,60 @@
             transform: scale(0.98);
         }
 
+        /* Action Buttons */
+        .btn-action {
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            flex: 1;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            color: white;
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-confirm:active {
+            transform: translateY(0);
+        }
+
+        .btn-decline {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        body.dark-mode .btn-decline {
+            background: #334155;
+            color: #cbd5e1;
+            border-color: #475569;
+        }
+
+        .btn-decline:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        body.dark-mode .btn-decline:hover {
+            background: #475569;
+            color: #f8fafc;
+        }
+
         /* Sidebar styling */
         .sidebar {
             width: 280px;
@@ -581,9 +635,6 @@
             <div class="nav-item" onclick="switchView('historyView', this); loadHistory();">
                 <i class="fa-solid fa-clock-rotate-left"></i> History
             </div>
-            <div class="nav-item" onclick="switchView('medicationsView', this); loadMedications();">
-                <i class="fa-solid fa-capsules"></i> Medications
-            </div>
             <div style="flex-grow: 1;"></div>
             <div class="nav-item" id="userNameDisplay">
                 <i class="fa-regular fa-circle-user"></i> Guest User
@@ -600,7 +651,6 @@
             </div>
             <div class="header-actions">
                 <i class="fa-solid fa-sun" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark Mode"></i>
-                <i class="fa-regular fa-bell"></i>
             </div>
         </header>
 
@@ -610,9 +660,19 @@
                 <!-- Messages will be injected here -->
             </div>
 
+            <!-- Attachment Preview Bar -->
+            <div id="attachmentBar" style="display: none; padding: 12px 24px; background: var(--sidebar-bg); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                <div style="background: rgba(13, 148, 136, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 10px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(13, 148, 136, 0.2);">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span id="attachedFileName" style="font-weight: 600;">file.pdf</span>
+                    <i class="fa-solid fa-circle-xmark" style="cursor: pointer; opacity: 0.7; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7" onclick="clearAttachment()"></i>
+                </div>
+            </div>
+
             <div class="input-container">
                 <div class="input-wrapper disabled-state" id="inputWrapper">
-                    <button class="action-btn" title="Attach file (demo)" disabled>
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                    <button class="action-btn" id="attachBtn" title="Attach file" onclick="document.getElementById('fileInput').click()" disabled>
                         <i class="fa-solid fa-paperclip"></i>
                     </button>
                     <input type="text" id="userInput" placeholder="Please complete registration first..."
@@ -633,28 +693,8 @@
             </div>
         </div>
 
-        <div id="medicationsView" class="view-container"
-            style="display: none; padding: 32px; overflow-y: auto; height: calc(100vh - 70px);">
-            <h2 style="margin-bottom: 20px;">My Medications</h2>
-            <div id="medsList" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px;">
-                <div style="color: var(--text-muted);">Loading medications...</div>
-            </div>
-
-            <div class="med-form"
-                style="background: var(--sidebar-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <h3 style="margin-bottom: 15px;">Add New Medication</h3>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-                    <input type="text" id="medName" placeholder="Medication Name"
-                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 200px;">
-                    <input type="text" id="medDosage" placeholder="Dosage (e.g. 500mg)"
-                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 120px;">
-                    <input type="text" id="medFreq" placeholder="Frequency"
-                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 120px;">
-                    <button class="primary-btn" onclick="addMedication()"
-                        style="margin-top: 0; padding: 10px 20px;">Add</button>
-                </div>
-            </div>
         </div>
+    </main>
     </main>
 
     <script>
@@ -666,6 +706,13 @@
 
         let userProfile = null;
         let userLocation = null;
+        let pendingFile = null;
+
+        function clearAttachment() {
+            pendingFile = null;
+            document.getElementById('attachmentBar').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
 
         // ── Geolocation ───────────────────────────────────────────────────────────
         if (navigator.geolocation) {
@@ -780,13 +827,11 @@
             // Hide Modal
             document.getElementById('onboardingModal').classList.add('hidden');
 
-            // Enable Chat Input
+            // Enable inputs
             inputWrapper.classList.remove('disabled-state');
             userInput.disabled = false;
             sendBtn.disabled = false;
-
-            // Enable file attach button visually (demo)
-            document.querySelector('.action-btn[title="Attach file (demo)"]').disabled = false;
+            document.getElementById('attachBtn').disabled = false;
 
             userInput.placeholder = "Describe your symptoms or ask a question...";
 
@@ -811,20 +856,80 @@
 
         async function sendMessage() {
             const text = userInput.value.trim();
-            if (!text || userInput.disabled) return;
+            if (!text && !pendingFile) return;
+            if (userInput.disabled) return;
 
             // Disable input briefly while sending
             userInput.disabled = true;
             sendBtn.disabled = true;
+            document.getElementById('attachBtn').disabled = true;
 
-            // 1. Display User Message
-            appendMessage(text, 'user');
+            let finalMessage = text;
+            let fileInfo = null;
+
+            // 1. Upload file if pending
+            if (pendingFile) {
+                const formData = new FormData();
+                formData.append('file', pendingFile);
+                formData.append('userId', userProfile.id);
+
+                try {
+                    const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.success) {
+                        fileInfo = data;
+                        let fileHtml = '';
+                        const isImage = pendingFile.type.startsWith('image/');
+                        
+                        if (isImage) {
+                            fileHtml = `<div style="margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                                <img src="${data.url}" style="max-width: 100%; display: block; max-height: 300px; object-fit: cover;">
+                                <div style="padding: 8px 12px; background: rgba(0,0,0,0.2); font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-image"></i> ${pendingFile.name}
+                                </div>
+                            </div>`;
+                        } else {
+                            fileHtml = `<div class="file-attachment" style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.1); transition: background 0.2s; cursor: pointer;" onclick="window.open('${data.url}', '_blank')">
+                                <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                    <i class="fa-solid fa-file-medical"></i>
+                                </div>
+                                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <div style="font-weight: 600;">${pendingFile.name}</div>
+                                    <div style="font-size: 0.7rem; opacity: 0.7;">Click to view document</div>
+                                </div>
+                                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                            </div>`;
+                        }
+                        finalMessage = (text ? `<div style="margin-bottom: 8px;">${text}</div>` : "") + fileHtml;
+                    }
+                } catch (err) {
+                    console.error("Upload failed", err);
+                }
+            }
+
+            // 2. Display User Message
+            appendMessage(finalMessage, 'user');
             userInput.value = '';
+            clearAttachment();
 
-            // 2. Show Typing Indicator
+            // 3. Show Typing Indicator
             const typingId = appendTypingIndicator();
 
             // 3. Send to Backend
+            const statusIntervals = [
+                { ms: 1500, text: "Analyzing your symptoms..." },
+                { ms: 3500, text: "Consulting medical database..." },
+                { ms: 5500, text: "Formulating clinical advice..." },
+                { ms: 8000, text: "Preparing final response..." }
+            ];
+
+            const timers = statusIntervals.map(step => 
+                setTimeout(() => {
+                    const statusEl = document.getElementById(`${typingId}-status`);
+                    if (statusEl) statusEl.textContent = step.text;
+                }, step.ms)
+            );
+
             try {
                 const userId = userProfile ? userProfile.id : 'guest';
                 const response = await fetch('/api/chat', {
@@ -837,8 +942,11 @@
                     })
                 });
 
-                const data = await response.json();
+                // Clear status timers once response arrives
+                timers.forEach(t => clearTimeout(t));
 
+                const data = await response.json();
+                
                 // 4. Remove typing indicator and show response
                 document.getElementById(typingId).remove();
 
@@ -862,6 +970,7 @@
                     // Re-enable input if no confirmation needed
                     userInput.disabled = false;
                     sendBtn.disabled = false;
+                    document.getElementById('attachBtn').disabled = false;
                     userInput.focus();
                 }
 
@@ -870,6 +979,7 @@
                 appendMessage("Connection error. Is the server running?", 'ai');
                 userInput.disabled = false;
                 sendBtn.disabled = false;
+                document.getElementById('attachBtn').disabled = false;
             }
         }
 
@@ -880,13 +990,13 @@
 
             const cardHtml = `
                 <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
-                <div class="message ai-msg" style="width: 100%; border: 1px solid var(--primary); background: #f0fdfa;">
-                    ${proposalText ? `<div style="margin-bottom: 12px; font-weight: 500;">${proposalText.replace(/\n/g, '<br>')}</div>` : ''}
-                    <div style="display: flex; gap: 10px;">
-                        <button class="primary-btn" id="confirmYes" style="margin-top: 0; flex: 1; font-size: 0.9rem;">
-                            <i class="fa-solid fa-calendar-check"></i> Yes, Book
+                <div class="message ai-msg" style="width: 100%; border: 1px solid var(--primary); background: rgba(13, 148, 136, 0.05); padding: 24px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
+                    ${proposalText ? `<div style="margin-bottom: 20px; font-size: 1rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">${proposalText.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn-action btn-confirm" id="confirmYes">
+                            <i class="fa-solid fa-calendar-check"></i> Yes, Book Appointment
                         </button>
-                        <button class="primary-btn" id="confirmNo" style="margin-top: 0; flex: 1; font-size: 0.9rem; background: #64748b;">
+                        <button class="btn-action btn-decline" id="confirmNo">
                             No Thanks
                         </button>
                     </div>
@@ -970,6 +1080,7 @@
                         <div class="dot"></div>
                         <div class="dot"></div>
                     </div>
+                    <div class="typing-status" id="${id}-status" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; font-weight: 500;">Understanding your request...</div>
                 </div>
             `;
 
@@ -1016,7 +1127,7 @@
                 inputWrapper.classList.remove('disabled-state');
                 userInput.disabled = false;
                 sendBtn.disabled = false;
-                document.querySelector('.action-btn[title="Attach file (demo)"]').disabled = false;
+                document.getElementById('attachBtn').disabled = false;
                 userInput.placeholder = "Describe your symptoms or ask a question...";
 
                 // Send "Welcome back" message
@@ -1077,99 +1188,60 @@
                 container.innerHTML = '<div style="color: #ef4444;">Error loading history.</div>';
             }
         }
-
-        async function loadMedications() {
-            if (!userProfile) return;
-            const container = document.getElementById('medsList');
-            container.innerHTML = '<div style="color: var(--text-muted);">Loading medications...</div>';
-            try {
-                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
-                const data = await res.json();
-                renderMedications(data.medications || []);
-            } catch (e) {
-                container.innerHTML = '<div style="color: #ef4444;">Error loading medications.</div>';
+        // ── File Upload & Drag-and-Drop ──────────────────────────────────────────
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                queueFile(files[0]);
             }
         }
 
-        function renderMedications(meds) {
-            const container = document.getElementById('medsList');
-            container.innerHTML = '';
-            if (meds.length === 0) {
-                container.innerHTML = '<div style="color: var(--text-muted);">No medications found.</div>';
-                return;
-            }
-            meds.forEach((med, index) => {
-                const card = document.createElement('div');
-                card.style.background = 'var(--ai-msg-bg)';
-                card.style.padding = '16px';
-                card.style.borderRadius = '12px';
-                card.style.display = 'flex';
-                card.style.justifyContent = 'space-between';
-                card.style.alignItems = 'center';
-
-                card.innerHTML = `
-                    <div>
-                        <strong style="font-size: 1.1rem; color: var(--primary);">${med.name}</strong>
-                        <div style="color: var(--text-muted); margin-top: 4px;">Dosage: ${med.dosage} | Frequency: ${med.freq}</div>
-                    </div>
-                    <button class="action-btn" onclick="removeMedication(${index})" style="color: #ef4444;" title="Remove">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                container.appendChild(card);
-            });
+        function queueFile(file) {
+            pendingFile = file;
+            document.getElementById('attachedFileName').textContent = file.name;
+            document.getElementById('attachmentBar').style.display = 'block';
+            userInput.placeholder = "Add a message about this file...";
+            userInput.focus();
         }
 
-        async function addMedication() {
-            if (!userProfile) return;
-            const name = document.getElementById('medName').value.trim();
-            const dosage = document.getElementById('medDosage').value.trim();
-            const freq = document.getElementById('medFreq').value.trim();
+        // Drag and Drop listeners
+        const dropZone = document.getElementById('chatView');
 
-            if (!name) {
-                alert("Please enter medication name.");
-                return;
-            }
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
 
-            try {
-                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
-                const data = await res.json();
-                const meds = data.medications || [];
-                meds.push({ name, dosage, freq });
-
-                await fetch('/api/medications', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userProfile.id, medications: meds })
-                });
-
-                document.getElementById('medName').value = '';
-                document.getElementById('medDosage').value = '';
-                document.getElementById('medFreq').value = '';
-
-                renderMedications(meds);
-            } catch (e) {
-                alert("Error adding medication.");
-            }
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        async function removeMedication(index) {
-            if (!userProfile) return;
-            try {
-                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
-                const data = await res.json();
-                let meds = data.medications || [];
-                meds.splice(index, 1);
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
 
-                await fetch('/api/medications', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userProfile.id, medications: meds })
-                });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
 
-                renderMedications(meds);
-            } catch (e) {
-                alert("Error removing medication.");
+        function highlight(e) {
+            inputWrapper.style.borderColor = 'var(--primary)';
+            inputWrapper.style.boxShadow = '0 0 10px rgba(13, 148, 136, 0.2)';
+        }
+
+        function unhighlight(e) {
+            inputWrapper.style.borderColor = 'var(--border-color)';
+            inputWrapper.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.05)';
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            if (userInput.disabled) return;
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                queueFile(files[0]);
             }
         }
     </script>
