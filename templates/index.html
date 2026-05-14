@@ -575,8 +575,8 @@
             AhYakar
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="switchView('chatView', this)">
-                <i class="fa-solid fa-message"></i> New Consultation
+            <div class="nav-item active" onclick="newConsultation()">
+                <i class="fa-solid fa-comments"></i> New Consultation
             </div>
             <div class="nav-item" onclick="switchView('historyView', this); loadHistory();">
                 <i class="fa-solid fa-clock-rotate-left"></i> History
@@ -1027,10 +1027,39 @@
             }
         });
 
+        async function newConsultation() {
+            if (!userProfile) return;
+            
+            // Call API to reset session on backend
+            try {
+                await fetch('/api/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id })
+                });
+            } catch (e) {
+                console.error("Failed to reset session:", e);
+            }
+
+            // Clear UI
+            chatMessages.innerHTML = '';
+            const greeting = `Starting a fresh consultation. How can I help you today, ${userProfile.name}?`;
+            appendMessage(greeting, 'ai');
+            
+            // Ensure we are in chat view
+            switchView('chatView');
+        }
+
         function switchView(viewId, element) {
             // Update active class on nav
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            if (element) element.classList.add('active');
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // If called programmatically, find the correct nav item
+                const navItem = Array.from(document.querySelectorAll('.nav-item')).find(el => el.textContent.includes(viewId === 'chatView' ? 'New Consultation' : ''));
+                if (navItem) navItem.classList.add('active');
+            }
 
             // Hide all views
             document.querySelectorAll('.view-container').forEach(el => {

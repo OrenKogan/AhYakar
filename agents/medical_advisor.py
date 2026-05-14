@@ -43,46 +43,56 @@ TREATMENT PATH DECISION — choose the most appropriate path:
 
 - "emergency" : Immediate life threat only (chest pain, stroke signs, anaphylaxis, unconsciousness, severe bleeding). Direct patient to call 101 immediately.
 
+- "more_info_needed" : Use this if the symptoms are too vague to differentiate between conditions that require different treatment paths (e.g., distinguishing a simple cold from Strep throat or COVID). Aim for the "sweet spot": ask follow-up questions only until you have a solid "clinical feeling" of the diagnosis. Avoid asking more than 3 follow-up questions in total across the conversation.
+
+PROMPT HEURISTIC: Review the conversation history. If you have already asked 2-3 questions and the user has provided enough detail to form a high-probability diagnosis, you MUST proceed to "otc" or "doctor_needed". Do not get stuck in an infinite questioning loop.
+
 You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 {
-  "diagnosis": "Probable diagnosis in 1 sentence",
-  "action": "otc | doctor_needed | emergency",
-  "reply": "Short, direct message. Always include: (1) diagnosis, (2) what to do — specific OTC medication with name + dosage AND self-care steps. If doctor_needed: add which specialist and why a doctor is needed. If emergency: call 112/911 + reason. Last line: I am an AI, not a licensed doctor.",
-  "otc_medications": ["OTC medication with dosage, e.g. 'Ibuprofen 400mg every 8h with food, max 3 doses/day'"],
-  "specialist_type": "e.g. General Practitioner, Dermatologist, ENT — only if doctor_needed, else null",
+  "diagnosis": "Probable diagnosis in 1 sentence, or 'Uncertain' if more info needed",
+  "action": "otc | doctor_needed | emergency | more_info_needed",
+  "reply": "Short, direct message. If more_info_needed, ask your follow-up question. Else, include: (1) diagnosis, (2) what to do. Last line: I am an AI, not a licensed doctor.",
+  "otc_medications": ["OTC medication with dosage if applicable, else empty list"],
+  "specialist_type": "e.g. General Practitioner — only if doctor_needed, else null",
   "urgency": "immediately | within_24h | this_week | whenever — only if doctor_needed, else null"
 }
+
+AGENT MEMORY:
+Your memory is provided in the 'Patient Data' block. It contains all symptoms and history extracted by previous agents and your own follow-up turns. You MUST use this data to avoid asking questions about things the patient has already confirmed or denied.
 """
 
 
-def advise(client: OpenAI, triage: dict) -> dict:
+def advise(client: OpenAI, triage: dict, chat_history: list) -> dict:
     """
     Run the Medical Advisor agent.
 
     Args:
         client : OpenAI-compatible client.
         triage : Triage dict from Agent 1 (symptoms, duration, history).
-
-    Returns:
-        An advice dict. The 'reply' field is the full patient-facing message,
-        including the booking question when action is 'doctor_needed'.
+        chat_history : The full conversation history.
     """
     symptoms = triage.get('symptoms', [])
     medical_context = retrieve_medical_context(symptoms)
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": (
-                f"{medical_context}\n\n"
-                f"Patient Case:\n"
-                f"Symptoms: {', '.join(symptoms)}\n"
-                f"Duration: {triage.get('duration', 'unknown')}\n"
-                f"Medical history / notes: {triage.get('relevant_history', 'none')}"
-            ),
-        },
     ]
+    
+    # Add history for context (last 5 messages to avoid token bloat)
+    for msg in chat_history[-5:]:
+        messages.append(msg)
+
+    # Add the current retrieved medical context and patient data
+    messages.append({
+        "role": "user",
+        "content": (
+            f"Verified Medical Reference Data:\n{medical_context}\n\n"
+            f"Patient Data (Latest Triage):\n"
+            f"Symptoms: {', '.join(symptoms)}\n"
+            f"Duration: {triage.get('duration', 'unknown')}\n"
+            f"Relevant history: {triage.get('relevant_history', 'none')}"
+        )
+    })
 
     response = client.chat.completions.create(
         model="google/gemini-2.5-flash",

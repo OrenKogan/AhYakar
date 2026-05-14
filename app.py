@@ -60,6 +60,12 @@ def get_session(session_id: str) -> dict:
             "chat_history": [],
             "pending_action": None,
             "last_triage": None,
+            "patient_profile": {
+                "symptoms": [],
+                "duration": "unknown",
+                "relevant_history": "none",
+                "medications": []
+            }
         }
     return sessions[session_id]
 
@@ -98,12 +104,28 @@ def chat():
         triage = intake_analyst.analyze(client, user_message, sess["chat_history"])
         sess["last_triage"] = triage
         
+        # Merge memory into patient_profile
+        profile = sess["patient_profile"]
+        for sym in triage.get("symptoms", []):
+            if sym.lower() not in [s.lower() for s in profile["symptoms"]]:
+                profile["symptoms"].append(sym)
+        
+        if triage.get("duration") != "unknown":
+            profile["duration"] = triage["duration"]
+        if triage.get("relevant_history") != "none":
+            profile["relevant_history"] = triage["relevant_history"]
+
         action1 = triage.get("action", "escalate")
 
-        if action1 == "no_symptoms":
+        if action1 == "no_symptoms" and not profile["symptoms"]:
             reply = "I'm here to help with your health! Describe any symptoms you have."
             sess["chat_history"].append({"role": "assistant", "content": reply})
             return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
+
+        # If we have symptoms in profile, but analyst says 'no_symptoms' for the latest word
+        # (e.g. user said 'Yes' to a question), we should still escalate to advisor
+        if action1 == "no_symptoms" and profile["symptoms"]:
+            action1 = "escalate"
 
         if action1 == "home_remedy":
             reply = triage.get("home_remedy_advice") or "This sounds like it can be managed at home with rest and fluids."
@@ -113,7 +135,8 @@ def chat():
 
         # ── Agent 2: Medical Advisor ─────────────────────────────────────────
         logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
-        advice = medical_advisor.advise(client, triage)
+        # Pass the accumulated profile instead of just the latest triage
+        advice = medical_advisor.advise(client, profile, sess["chat_history"])
         action2 = advice.get("action", "doctor_needed")
 
         if action2 == "emergency":
@@ -125,6 +148,11 @@ def chat():
             reply = advice.get("reply", "")
             sess["chat_history"].append({"role": "assistant", "content": reply})
             return jsonify({"stage": "otc", "reply": reply, "requires_confirm": False})
+
+        if action2 == "more_info_needed":
+            reply = advice.get("reply", "")
+            sess["chat_history"].append({"role": "assistant", "content": reply})
+            return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
 
         # Doctor needed → Agent 3: Appointment Planner
         logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
@@ -213,6 +241,29 @@ def medications():
         return jsonify({"error": "userId required"}), 400
     sess = get_session(user_id)
     return jsonify({"medications": sess.get("medications", [])})
+
+
+@app.route("/api/reset", methods=["POST"])
+def reset():
+    """Clear session data for a new consultation."""
+    data = request.json or {}
+    session_id = (data.get("userId") or data.get("session_id") or "").strip()
+    if not session_id:
+        return jsonify({"error": "userId required"}), 400
+    
+    if session_id in sessions:
+        sessions[session_id] = {
+            "chat_history": [],
+            "pending_action": None,
+            "last_triage": None,
+            "patient_profile": {
+                "symptoms": [],
+                "duration": "unknown",
+                "relevant_history": "none",
+                "medications": []
+            }
+        }
+    return jsonify({"success": True})
 
 
 if __name__ == "__main__":
