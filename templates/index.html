@@ -1,97 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AhYakar — Medical Assistant</title>
-    <meta name="description" content="AhYakar: your AI-powered medical assistant for symptom analysis and appointment scheduling.">
+    <title>AhYakar Medical Assistant</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
         :root {
-            --green-dark:  #00574a;
-            --green-mid:   #007a65;
-            --green-light: #00a884;
-            --bg:          #0b1218;
-            --surface:     #111b21;
-            --surface2:    #202c33;
-            --surface3:    #2a3942;
-            --text:        #e9edef;
-            --text-dim:    #8696a0;
-            --user-bubble: #005c4b;
-            --bot-bubble:  #202c33;
-            --accent:      #00a884;
-            --warning:     #f0c04a;
-            --danger:      #ea4848;
-            --radius:      18px;
-            --transition:  0.2s ease;
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --bg-color: #f8fafc;
+            --sidebar-bg: #ffffff;
+            --chat-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --user-msg-bg: linear-gradient(135deg, #0d9488, #0f766e);
+            --ai-msg-bg: #f1f5f9;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --sidebar-bg: #1e293b;
+            --chat-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --ai-msg-bg: #334155;
+        }
+
+        body.dark-mode .modal-card {
+            background: var(--sidebar-bg);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #0f172a;
+            color: var(--text-main);
+        }
+
+        body.dark-mode .input-wrapper {
+            background: var(--sidebar-bg);
+        }
+
+        body.dark-mode .input-wrapper.disabled-state {
+            background: #0f172a;
+        }
+
+        body.dark-mode .action-btn:hover:not(:disabled) {
+            background: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* ── Chat shell ──────────────────────────────────────────────────── */
-        .shell {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.4s;
+        }
+
+        .modal-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-direction: column;
-            background: var(--surface);
+            gap: 20px;
+            transform: translateY(0);
+            transition: transform 0.4s;
         }
 
-        /* ── Header ──────────────────────────────────────────────────────── */
-        .header {
-            background: var(--surface2);
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            border-bottom: 1px solid var(--surface3);
-            flex-shrink: 0;
+        .modal-overlay.hidden .modal-card {
+            transform: translateY(20px);
         }
-        .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--green-mid), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-        .header-info h1 { font-size: 1rem; font-weight: 600; }
-        .header-info p  { font-size: 0.75rem; color: var(--text-dim); }
 
-        /* agent pipeline badge */
-        .pipeline-badge {
-            margin-left: auto;
+        .modal-card h2 {
+            color: var(--primary);
+            margin-bottom: -5px;
             display: flex;
-            gap: 6px;
             align-items: center;
+            gap: 10px;
         }
-        .step-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--surface3);
-            transition: background var(--transition), transform var(--transition);
-        }
-        .step-dot.active  { background: var(--accent); transform: scale(1.3); }
-        .step-dot.done    { background: var(--green-dark); }
 
-        /* ── Messages ─────────────────────────────────────────────────────── */
-        .messages {
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85rem;
+            min-height: 18px;
+            display: none;
+            margin-top: -2px;
+            animation: fadeIn 0.2s;
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 10px;
+        }
+
+        .primary-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .primary-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand i {
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
             flex: 1;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: #f0fdfa;
+            color: var(--primary);
+        }
+
+        /* Main Chat Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+            position: relative;
+        }
+
+        .top-header {
+            height: 70px;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 16px;
+            color: var(--text-muted);
+        }
+
+        .header-actions i {
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 1.2rem;
+        }
+
+        .header-actions i:hover {
+            color: var(--primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        /* Chat Box */
+        .chat-box {
+            flex: 1;
+            padding: 32px;
             overflow-y: auto;
             padding: 20px 16px;
             display: flex;
@@ -99,577 +300,784 @@
             gap: 6px;
             scroll-behavior: smooth;
         }
-        .messages::-webkit-scrollbar { width: 4px; }
-        .messages::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: var(--surface3);
+            border-radius: 4px;
+        }
 
         .row {
             display: flex;
             flex-direction: column;
-            max-width: 85%;
-        }
-        .row.user  { align-self: flex-end; align-items: flex-end; }
-        .row.bot   { align-self: flex-start; align-items: flex-start; }
-
-        .bubble {
-            padding: 10px 14px;
-            border-radius: var(--radius);
-            line-height: 1.55;
-            font-size: 0.9rem;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-        .row.user .bubble {
-            background: var(--user-bubble);
-            border-bottom-right-radius: 4px;
-        }
-        .row.bot .bubble {
-            background: var(--bot-bubble);
-            border-bottom-left-radius: 4px;
+            gap: 24px;
+            scroll-behavior: smooth;
         }
 
-        .bubble strong { font-weight: 600; }
-        .bubble em     { color: var(--text-dim); font-style: normal; font-size: 0.82rem; }
-
-        /* severity pill */
-        .severity-pill {
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 99px;
-            margin-bottom: 4px;
-            display: inline-block;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .sev-low      { background: #1a3a2e; color: #4caf87; }
-        .sev-moderate { background: #2e2a10; color: var(--warning); }
-        .sev-high     { background: #2e1a10; color: #f08050; }
-        .sev-emergency{ background: #2e1010; color: var(--danger); }
-
-        /* ── Typing indicator ─────────────────────────────────────────────── */
-        .typing-row { align-self: flex-start; }
-        .typing-bubble {
-            background: var(--bot-bubble);
-            border-radius: var(--radius);
-            border-bottom-left-radius: 4px;
-            padding: 12px 16px;
+        .message-wrapper {
             display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .typing-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .typing-step {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.82rem;
-            color: var(--text-dim);
+            gap: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.4s ease forwards;
             opacity: 0;
-            transform: translateY(4px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px);
         }
-        .typing-step.visible {
-            opacity: 1;
-            transform: translateY(0);
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .typing-step.done-step { color: var(--text-dim); }
-        .typing-step.done-step .step-icon { color: var(--accent); }
-        .typing-step.active-step { color: var(--text); }
-        .step-icon { font-size: 0.9rem; width: 1.2em; text-align: center; }
-        .spinner {
-            width: 10px; height: 10px;
-            border: 2px solid var(--surface3);
-            border-top-color: var(--accent);
+
+        .message-wrapper.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── Confirm/Decline card ─────────────────────────────────────────── */
-        .confirm-card {
-            background: var(--bot-bubble);
-            border: 1px solid var(--surface3);
-            border-radius: var(--radius);
-            border-bottom-left-radius: 4px;
-            overflow: hidden;
-        }
-        .confirm-card .proposal-text {
-            padding: 12px 14px;
-            font-size: 0.9rem;
-            line-height: 1.55;
-        }
-        .confirm-actions {
-            display: flex;
-            border-top: 1px solid var(--surface3);
-        }
-        .confirm-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.88rem;
-            font-weight: 600;
-            transition: background var(--transition);
-        }
-        .confirm-btn.yes {
-            background: var(--green-dark);
-            color: #fff;
-            border-right: 1px solid var(--surface3);
-        }
-        .confirm-btn.yes:hover { background: var(--green-mid); }
-        .confirm-btn.no {
-            background: transparent;
-            color: var(--text-dim);
-        }
-        .confirm-btn.no:hover { background: var(--surface3); color: var(--text); }
-        .confirm-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* ── Input area ───────────────────────────────────────────────────── */
-        .input-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            background: var(--surface2);
-            border-top: 1px solid var(--surface3);
-            flex-shrink: 0;
-        }
-        #userInput {
-            flex: 1;
-            background: var(--surface3);
-            border: none;
-            border-radius: 24px;
-            padding: 11px 18px;
-            color: var(--text);
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-            transition: background var(--transition);
-        }
-        #userInput::placeholder { color: var(--text-dim); }
-        #userInput:focus { background: #344047; }
-
-        #sendBtn {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            border: none;
-            background: var(--accent);
-            color: #fff;
-            font-size: 1.1rem;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background var(--transition), transform var(--transition);
             flex-shrink: 0;
+            font-size: 1.1rem;
         }
-        #sendBtn:hover  { background: var(--green-mid); }
-        #sendBtn:active { transform: scale(0.93); }
-        #sendBtn:disabled { background: var(--surface3); cursor: not-allowed; }
+
+        .ai-avatar {
+            background-color: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .user-avatar {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .message {
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            word-wrap: break-word;
+        }
+
+        .ai-msg {
+            background-color: var(--ai-msg-bg);
+            border-top-left-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .user-msg {
+            background: var(--user-msg-bg);
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        /* Input Area */
+        .input-container {
+            padding: 24px 32px;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            gap: 12px;
+            transition: opacity 0.3s;
+        }
+
+        .input-wrapper.disabled-state {
+            opacity: 0.5;
+            background: #f1f5f9;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--text-main);
+            background: transparent;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #94a3b8;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+            align-items: center;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                transform: translateX(-100%);
+                height: 100%;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .input-container {
+                padding: 16px;
+            }
+
+            .chat-box {
+                padding: 16px;
+            }
+
+            .message-wrapper {
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
-<body>
 
-<main class="shell" role="main">
-    <!-- Header -->
-    <header class="header">
-        <div class="avatar" aria-hidden="true">🩺</div>
-        <div class="header-info">
-            <h1>AhYakar Health Bot</h1>
-            <p id="headerStatus">AI Medical Assistant</p>
-        </div>
-        <div class="pipeline-badge" title="Agent pipeline status" aria-label="Pipeline steps">
-            <div class="step-dot" id="dot1" title="Intake Analyst"></div>
-            <div class="step-dot" id="dot2" title="Medical Advisor"></div>
-            <div class="step-dot" id="dot3" title="Appointment Planner"></div>
-            <div class="step-dot" id="dot4" title="Executor"></div>
-        </div>
-    </header>
+<body class="dark-mode">
 
-    <!-- Messages -->
-    <section class="messages" id="chatBox" aria-live="polite" aria-label="Chat messages">
-        <div class="row bot">
-            <div class="bubble">
-                Hello! I'm the <strong>AhYakar Medical AI</strong>. I can help with minor health concerns, suggest OTC medications, and schedule doctor appointments if needed.
-                <br><br>
-                How are you feeling today?
+    <!-- Onboarding Modal -->
+    <div class="modal-overlay" id="onboardingModal">
+        <div class="modal-card">
+            <h2><i class="fa-solid fa-heart-pulse"></i> AhYakar Health</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Please enter your details to begin the consultation
+                securely.</p>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="userName" placeholder="Israel Israeli"
+                    oninput="clearError('userName', 'nameError')">
+                <div class="error-msg" id="nameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label>ID Number (תעודת זהות)</label>
+                <input type="text" id="userId" placeholder="123456789" oninput="clearError('userId', 'idError')">
+                <div class="error-msg" id="idError"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Health Fund (HMO)</label>
+                <select id="userKupa" onchange="clearError('userKupa', 'kupaError')">
+                    <option value="">Select HMO...</option>
+                    <option value="Clalit">Clalit</option>
+                    <option value="Maccabi">Maccabi</option>
+                    <option value="Meuhedet">Meuhedet</option>
+                    <option value="Leumit">Leumit</option>
+                </select>
+                <div class="error-msg" id="kupaError"></div>
+            </div>
+
+            <button class="primary-btn" onclick="submitDetails()">Start Consultation</button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-heart-pulse"></i>
+            AhYakar
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchView('chatView', this)">
+                <i class="fa-solid fa-message"></i> New Consultation
+            </div>
+            <div class="nav-item" onclick="switchView('historyView', this); loadHistory();">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
+            </div>
+            <div class="nav-item" onclick="switchView('medicationsView', this); loadMedications();">
+                <i class="fa-solid fa-capsules"></i> Medications
+            </div>
+            <div style="flex-grow: 1;"></div>
+            <div class="nav-item" id="userNameDisplay">
+                <i class="fa-regular fa-circle-user"></i> Guest User
             </div>
         </div>
-    </section>
+    </aside>
 
-    <!-- Input -->
-    <div class="input-area">
-        <input
-            type="text"
-            id="userInput"
-            placeholder="Describe your symptoms…"
-            aria-label="Your message"
-            autocomplete="off"
-        >
-        <button id="sendBtn" aria-label="Send message" onclick="sendMessage()">➤</button>
-    </div>
-</main>
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <i class="fa-solid fa-bars menu-toggle" onclick="toggleSidebar()"></i>
+                <div class="header-title">Medical Assistant AI</div>
+            </div>
+            <div class="header-actions">
+                <i class="fa-solid fa-sun" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark Mode"></i>
+                <i class="fa-regular fa-bell"></i>
+            </div>
+        </header>
 
-<script>
-// ── Session ──────────────────────────────────────────────────────────────────
-function getSessionId() {
-    let id = localStorage.getItem('ahyakar_session_id');
-    if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem('ahyakar_session_id', id);
-    }
-    return id;
-}
-const SESSION_ID = getSessionId();
+        <div id="chatView" class="view-container"
+            style="display: flex; flex-direction: column; flex: 1; height: calc(100vh - 70px);">
+            <div class="chat-box" id="chatBox">
+                <!-- Messages will be injected here -->
+            </div>
 
-// ── Geolocation ───────────────────────────────────────────────────────────────
-let userLocation = null;
-if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-        pos => {
-            userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-            console.log('[AhYakar] Location acquired:', userLocation);
-        },
-        err => {
-            console.warn('[AhYakar] Geolocation unavailable:', err.message);
+            <div class="input-container">
+                <div class="input-wrapper disabled-state" id="inputWrapper">
+                    <button class="action-btn" title="Attach file (demo)" disabled>
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <input type="text" id="userInput" placeholder="Please complete registration first..."
+                        onkeypress="handleKeyPress(event)" disabled>
+                    <button class="action-btn send-btn" id="sendBtn" onclick="sendMessage()" title="Send Message"
+                        disabled>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyView" class="view-container"
+            style="display: none; padding: 32px; overflow-y: auto; height: calc(100vh - 70px);">
+            <h2 style="margin-bottom: 20px;">Consultation History</h2>
+            <div id="historyContent" style="display: flex; flex-direction: column; gap: 16px;">
+                <div style="color: var(--text-muted);">Loading history...</div>
+            </div>
+        </div>
+
+        <div id="medicationsView" class="view-container"
+            style="display: none; padding: 32px; overflow-y: auto; height: calc(100vh - 70px);">
+            <h2 style="margin-bottom: 20px;">My Medications</h2>
+            <div id="medsList" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px;">
+                <div style="color: var(--text-muted);">Loading medications...</div>
+            </div>
+
+            <div class="med-form"
+                style="background: var(--sidebar-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <h3 style="margin-bottom: 15px;">Add New Medication</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <input type="text" id="medName" placeholder="Medication Name"
+                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 200px;">
+                    <input type="text" id="medDosage" placeholder="Dosage (e.g. 500mg)"
+                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 120px;">
+                    <input type="text" id="medFreq" placeholder="Frequency"
+                        style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); flex: 1; min-width: 120px;">
+                    <button class="primary-btn" onclick="addMedication()"
+                        style="margin-top: 0; padding: 10px 20px;">Add</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const inputWrapper = document.getElementById('inputWrapper');
+        const sidebar = document.getElementById('sidebar');
+
+        let userProfile = null;
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const icon = document.getElementById('themeToggle');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
         }
-    );
-}
 
-// ── DOM refs ─────────────────────────────────────────────────────────────────
-const chatBox     = document.getElementById('chatBox');
-const userInput   = document.getElementById('userInput');
-const sendBtn     = document.getElementById('sendBtn');
-const headerStatus = document.getElementById('headerStatus');
-const dots = [
-    document.getElementById('dot1'),
-    document.getElementById('dot2'),
-    document.getElementById('dot3'),
-    document.getElementById('dot4'),
-];
-
-userInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) sendMessage(); });
-
-// ── Pipeline step dots ────────────────────────────────────────────────────────
-function setDot(index, state) { // state: '' | 'active' | 'done'
-    dots[index].className = 'step-dot' + (state ? ' ' + state : '');
-}
-function resetDots() { dots.forEach(d => d.className = 'step-dot'); }
-function allDotsDone() { dots.forEach(d => d.className = 'step-dot done'); }
-
-// ── Typing indicator ──────────────────────────────────────────────────────────
-const STEPS = [
-    { icon: '🔍', label: 'Triaging your condition…' },
-    { icon: '🩻', label: 'Running clinical analysis…' },
-    { icon: '📍', label: 'Finding nearest available doctor…' },
-];
-
-function createTypingEl() {
-    const row = document.createElement('div');
-    row.className = 'row bot typing-row';
-    row.id = 'typingIndicator';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'typing-bubble';
-
-    const steps = document.createElement('div');
-    steps.className = 'typing-steps';
-
-    STEPS.forEach((s, i) => {
-        const el = document.createElement('div');
-        el.className = 'typing-step';
-        el.id = `step${i}`;
-        el.innerHTML = `<span class="step-icon">${s.icon}</span><span>${s.label}</span>`;
-        steps.appendChild(el);
-    });
-
-    bubble.appendChild(steps);
-    row.appendChild(bubble);
-    return row;
-}
-
-let stepTimer = null;
-function startTyping() {
-    resetDots();
-    const el = createTypingEl();
-    chatBox.appendChild(el);
-    scrollBottom();
-
-    let current = 0;
-    showStep(0);
-    setDot(0, 'active');
-
-    stepTimer = setInterval(() => {
-        setDot(current, 'done');
-        current++;
-        if (current < STEPS.length) {
-            showStep(current);
-            setDot(current, 'active');
-        } else {
-            clearInterval(stepTimer);
+        function showError(elementId, errorId, message) {
+            const el = document.getElementById(elementId);
+            const errEl = document.getElementById(errorId);
+            el.classList.add('error');
+            errEl.textContent = message;
+            errEl.style.display = 'block';
         }
-    }, 2500);
-}
 
-function showStep(i) {
-    const el = document.getElementById(`step${i}`);
-    if (el) {
-        el.classList.add('visible', 'active-step');
-        // Mark previous steps as done
-        for (let j = 0; j < i; j++) {
-            const prev = document.getElementById(`step${j}`);
-            if (prev) { prev.classList.remove('active-step'); prev.classList.add('done-step'); }
+        function clearError(elementId, errorId) {
+            const el = document.getElementById(elementId);
+            const errEl = document.getElementById(errorId);
+            if (el.classList.contains('error')) {
+                el.classList.remove('error');
+                errEl.style.display = 'none';
+                errEl.textContent = '';
+            }
         }
-    }
-}
 
-function stopTyping() {
-    clearInterval(stepTimer);
-    const el = document.getElementById('typingIndicator');
-    if (el) el.remove();
-    resetDots();
-    headerStatus.textContent = 'AI Medical Assistant';
-}
+        function clearErrors() {
+            ['userName', 'userId', 'userKupa'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('error');
+            });
+            ['nameError', 'idError', 'kupaError'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = '';
+                    el.style.display = 'none';
+                }
+            });
+        }
 
-// ── Scroll ────────────────────────────────────────────────────────────────────
-function scrollBottom() {
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+        function isValidIsraeliID(id) {
+            let idStr = String(id).trim();
+            if (idStr.length > 9 || idStr.length < 5 || isNaN(idStr)) return false;
+            // Pad with leading zeros to 9 digits
+            idStr = idStr.padStart(9, '0');
+            let sum = 0;
+            for (let i = 0; i < 9; i++) {
+                let digit = Number(idStr[i]);
+                let step = digit * ((i % 2) + 1);
+                sum += step > 9 ? step - 9 : step;
+            }
+            return sum % 10 === 0;
+        }
 
-// ── Append helpers ────────────────────────────────────────────────────────────
-function appendUserMessage(text) {
-    const row = document.createElement('div');
-    row.className = 'row user';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-    row.appendChild(bubble);
-    chatBox.appendChild(row);
-    scrollBottom();
-}
+        function submitDetails() {
+            clearErrors();
 
-function appendBotMessage(text, severity) {
-    const row = document.createElement('div');
-    row.className = 'row bot';
+            const name = document.getElementById('userName').value.trim();
+            const id = document.getElementById('userId').value.trim();
+            const kupa = document.getElementById('userKupa').value;
 
-    if (severity && severity !== 'low') {
-        const pill = document.createElement('div');
-        const labelMap = { moderate: '⚠️ Moderate', high: '🔶 High', emergency: '🚨 Emergency' };
-        const classMap = { moderate: 'sev-moderate', high: 'sev-high', emergency: 'sev-emergency' };
-        pill.className = `severity-pill ${classMap[severity] || ''}`;
-        pill.textContent = labelMap[severity] || severity;
-        row.appendChild(pill);
-    }
+            let hasError = false;
 
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    // Render simple markdown-ish: bold, italic/dim, line breaks
-    bubble.innerHTML = renderText(text);
-    row.appendChild(bubble);
-    chatBox.appendChild(row);
-    scrollBottom();
-}
+            if (!name) {
+                showError('userName', 'nameError', 'Please enter your full name.');
+                hasError = true;
+            } else if (name.length < 2) {
+                showError('userName', 'nameError', 'Name must be at least 2 characters long.');
+                hasError = true;
+            }
 
-function appendProposalCard(proposalText, onConfirm, onDecline) {
-    const row = document.createElement('div');
-    row.className = 'row bot';
+            if (!id) {
+                showError('userId', 'idError', 'Please enter your ID number.');
+                hasError = true;
+            } else if (!isValidIsraeliID(id)) {
+                showError('userId', 'idError', 'Please enter a valid Israeli ID number.');
+                hasError = true;
+            }
 
-    const card = document.createElement('div');
-    card.className = 'confirm-card';
-    card.id = 'confirmCard';
+            if (!kupa) {
+                showError('userKupa', 'kupaError', 'Please select your Health Fund (HMO).');
+                hasError = true;
+            }
 
-    const textDiv = document.createElement('div');
-    textDiv.className = 'proposal-text';
-    textDiv.innerHTML = renderText(proposalText);
-    card.appendChild(textDiv);
+            if (hasError) return;
 
-    const actions = document.createElement('div');
-    actions.className = 'confirm-actions';
+            // Save user profile
+            userProfile = { name, id, kupa };
+            localStorage.setItem('ahyakar_user', JSON.stringify(userProfile));
 
-    const yesBtn = document.createElement('button');
-    yesBtn.className = 'confirm-btn yes';
-    yesBtn.id = 'confirmYes';
-    yesBtn.textContent = '✅ Yes, book it';
-    yesBtn.onclick = () => { disableConfirmCard(); onConfirm(); };
+            // Update sidebar display
+            document.getElementById('userNameDisplay').innerHTML = `<i class="fa-regular fa-circle-user"></i> ${name}`;
 
-    const noBtn = document.createElement('button');
-    noBtn.className = 'confirm-btn no';
-    noBtn.id = 'confirmNo';
-    noBtn.textContent = 'No thanks';
-    noBtn.onclick = () => { disableConfirmCard(); onDecline(); };
+            // Hide Modal
+            document.getElementById('onboardingModal').classList.add('hidden');
 
-    actions.appendChild(yesBtn);
-    actions.appendChild(noBtn);
-    card.appendChild(actions);
-    row.appendChild(card);
-    chatBox.appendChild(row);
-    scrollBottom();
-}
+            // Enable Chat Input
+            inputWrapper.classList.remove('disabled-state');
+            userInput.disabled = false;
+            sendBtn.disabled = false;
 
-function disableConfirmCard() {
-    const card = document.getElementById('confirmCard');
-    if (card) {
-        card.querySelectorAll('button').forEach(b => b.disabled = true);
-    }
-}
+            // Enable file attach button visually (demo)
+            document.querySelector('.action-btn[title="Attach file (demo)"]').disabled = false;
 
-// ── Text renderer (simple markdown-ish) ──────────────────────────────────────
-function renderText(text) {
-    return text
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/_(.*?)_/g, '<em>$1</em>')
-        .replace(/\n---\n/g, '<hr style="border-color:var(--surface3);margin:8px 0">')
-        .replace(/\n/g, '<br>');
-}
+            userInput.placeholder = "Describe your symptoms or ask a question...";
 
-// ── Lock/unlock input ─────────────────────────────────────────────────────────
-function lockInput(status) {
-    userInput.disabled = true;
-    sendBtn.disabled = true;
-    headerStatus.textContent = status || 'Processing…';
-}
-function unlockInput() {
-    userInput.disabled = false;
-    sendBtn.disabled = false;
-    headerStatus.textContent = 'AI Medical Assistant';
-    userInput.focus();
-}
+            // Send Personalized Welcome Message
+            setTimeout(() => {
+                const greeting = `Hello ${name}! I see you are a member of ${kupa}. I am the AhYakar Medical Assistant. I'm here to provide guidance on minor health concerns and OTC medications.<br><br><strong>Note:</strong> I am an AI, not a doctor. If you are experiencing a medical emergency, please seek immediate care.<br><br>How can I help you today?`;
+                appendMessage(greeting, 'ai');
+            }, 600);
+        }
 
-// ── Main send ─────────────────────────────────────────────────────────────────
-async function sendMessage() {
-    const text = userInput.value.trim();
-    if (!text || userInput.disabled) return;
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+        }
 
-    userInput.value = '';
-    appendUserMessage(text);
-    lockInput('Analyzing…');
-    startTyping();
+        function handleKeyPress(e) {
+            // Check if Enter is pressed and input is not disabled
+            if (e.key === 'Enter' && !userInput.disabled) {
+                e.preventDefault(); // Prevent default enter behavior just in case
+                sendMessage();
+            }
+        }
 
-    try {
-        const res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, session_id: SESSION_ID, location: userLocation }),
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text || userInput.disabled) return;
+
+            // Disable input briefly while sending
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // 1. Display User Message
+            appendMessage(text, 'user');
+            userInput.value = '';
+
+            // 2. Show Typing Indicator
+            const typingId = appendTypingIndicator();
+
+            // 3. Send to Backend
+            try {
+                const userId = userProfile ? userProfile.id : 'guest';
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, userId: userId })
+                });
+
+                const data = await response.json();
+
+                // 4. Remove typing indicator and show response
+                document.getElementById(typingId).remove();
+
+                if (data.reply) {
+                    const formattedReply = data.reply.replace(/\\n/g, '<br>');
+                    appendMessage(formattedReply, 'ai');
+                } else {
+                    appendMessage("Error: Could not reach the medical database.", 'ai');
+                }
+
+            } catch (error) {
+                document.getElementById(typingId).remove();
+                appendMessage("Connection error. Is the server running?", 'ai');
+            } finally {
+                // Re-enable input
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${sender}`;
+
+            const avatarHtml = sender === 'user'
+                ? `<div class="avatar user-avatar"><i class="fa-solid fa-user"></i></div>`
+                : `<div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>`;
+
+            const msgClass = sender === 'user' ? 'user-msg' : 'ai-msg';
+
+            wrapper.innerHTML = `
+                ${avatarHtml}
+                <div class="message ${msgClass}">${text}</div>
+            `;
+
+            chatBox.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function appendTypingIndicator() {
+            const id = 'typing-' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.id = id;
+
+            wrapper.innerHTML = `
+                <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
+                <div class="message ai-msg">
+                    <div class="typing-indicator">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+            `;
+
+            chatBox.appendChild(wrapper);
+            scrollToBottom();
+            return id;
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !e.target.classList.contains('menu-toggle')) {
+                    sidebar.classList.remove('open');
+                }
+            }
         });
-        const data = await res.json();
-        stopTyping();
 
-        if (data.error) {
-            appendBotMessage('⚠️ ' + data.error);
-            unlockInput();
-            return;
-        }
-
-        // Show bot reply (no severity badge on new pipeline — stage-based)
-        appendBotMessage(data.reply);
-
-        if (data.stage === 'emergency') {
-            resetDots();
-            unlockInput();
-            return;
-        }
-
-        allDotsDone();
-
-        if (data.requires_confirm) {
-            // Show the Appointment Planner's question + Yes/No buttons
-            appendConfirmButtons(
-                data.proposal || null,
-                () => handleConfirm(true),
-                () => handleConfirm(false),
-            );
-            lockInput('Waiting for your decision…');
-        } else {
-            unlockInput();
-        }
-
-    } catch (err) {
-        stopTyping();
-        appendBotMessage('⚠️ Connection error. Is the server running?');
-        unlockInput();
-    }
-}
-
-// ── Confirm/Decline ───────────────────────────────────────────────────────────
-function appendConfirmButtons(proposalText, onConfirm, onDecline) {
-    const row = document.createElement('div');
-    row.className = 'row bot';
-
-    const card = document.createElement('div');
-    card.className = 'confirm-card';
-    card.id = 'confirmCard';
-
-    if (proposalText) {
-        const textDiv = document.createElement('div');
-        textDiv.className = 'proposal-text';
-        textDiv.innerHTML = renderText(proposalText);
-        card.appendChild(textDiv);
-    }
-
-    const actions = document.createElement('div');
-    actions.className = 'confirm-actions';
-
-    const yesBtn = document.createElement('button');
-    yesBtn.className = 'confirm-btn yes';
-    yesBtn.id = 'confirmYes';
-    yesBtn.textContent = '📅 Yes, find me a doctor';
-    yesBtn.onclick = () => { disableConfirmCard(); onConfirm(); };
-
-    const noBtn = document.createElement('button');
-    noBtn.className = 'confirm-btn no';
-    noBtn.id = 'confirmNo';
-    noBtn.textContent = 'No thanks';
-    noBtn.onclick = () => { disableConfirmCard(); onDecline(); };
-
-    actions.appendChild(yesBtn);
-    actions.appendChild(noBtn);
-    card.appendChild(actions);
-    row.appendChild(card);
-    chatBox.appendChild(row);
-    scrollBottom();
-}
-
-async function handleConfirm(confirmed) {
-    const label = confirmed ? '📅 Yes, find me a doctor' : 'No thanks';
-    appendUserMessage(label);
-    lockInput(confirmed ? 'Finding a doctor…' : 'Processing…');
-
-    if (confirmed) {
-        setDot(2, 'active');
-        headerStatus.textContent = 'Finding nearest doctor…';
-    }
-
-    try {
-        const res = await fetch('/api/confirm', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: SESSION_ID, confirmed }),
+        // Allow submitting modal form with Enter key
+        document.getElementById('onboardingModal').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                submitDetails();
+            }
         });
-        const data = await res.json();
 
-        if (confirmed) { setDot(2, 'done'); setDot(3, 'done'); }
+        // Check for saved user on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedProfile = localStorage.getItem('ahyakar_user');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
 
-        if (data.error) {
-            appendBotMessage('⚠️ ' + data.error);
-        } else {
-            appendBotMessage(data.reply);
+                // Update sidebar
+                document.getElementById('userNameDisplay').innerHTML = `<i class="fa-regular fa-circle-user"></i> ${userProfile.name}`;
+
+                // Hide modal without animation for immediate access
+                const modal = document.getElementById('onboardingModal');
+                modal.style.transition = 'none';
+                modal.classList.add('hidden');
+
+                // Enable inputs
+                inputWrapper.classList.remove('disabled-state');
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                document.querySelector('.action-btn[title="Attach file (demo)"]').disabled = false;
+                userInput.placeholder = "Describe your symptoms or ask a question...";
+
+                // Send "Welcome back" message
+                setTimeout(() => {
+                    const greeting = `Welcome back, ${userProfile.name}! I am the AhYakar Medical Assistant. How can I help you today?`;
+                    appendMessage(greeting, 'ai');
+                }, 400);
+            }
+        });
+
+        function switchView(viewId, element) {
+            // Update active class on nav
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            // Hide all views
+            document.querySelectorAll('.view-container').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show selected view
+            const view = document.getElementById(viewId);
+            if (view) {
+                if (viewId === 'chatView') {
+                    view.style.display = 'flex';
+                } else {
+                    view.style.display = 'block';
+                }
+            }
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+            }
         }
 
-    } catch (err) {
-        appendBotMessage('⚠️ Connection error during booking.');
-    } finally {
-        unlockInput();
-    }
-}
-</script>
+        async function loadHistory() {
+            if (!userProfile) return;
+            const container = document.getElementById('historyContent');
+            container.innerHTML = '<div style="color: var(--text-muted);">Loading history...</div>';
+            try {
+                const res = await fetch(`/api/history?userId=${userProfile.id}`);
+                const data = await res.json();
+                container.innerHTML = '';
+                if (data.history && data.history.length > 0) {
+                    data.history.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.style.padding = '16px';
+                        div.style.borderRadius = '12px';
+                        div.style.background = msg.role === 'user' ? 'var(--user-msg-bg)' : 'var(--ai-msg-bg)';
+                        div.style.color = msg.role === 'user' ? 'white' : 'var(--text-main)';
+                        div.innerHTML = `<strong>${msg.role === 'user' ? 'You' : 'AI'}:</strong><br><div style="margin-top: 8px;">${msg.content.replace(/\n/g, '<br>')}</div>`;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<div style="color: var(--text-muted);">No history found.</div>';
+                }
+            } catch (e) {
+                container.innerHTML = '<div style="color: #ef4444;">Error loading history.</div>';
+            }
+        }
 
+        async function loadMedications() {
+            if (!userProfile) return;
+            const container = document.getElementById('medsList');
+            container.innerHTML = '<div style="color: var(--text-muted);">Loading medications...</div>';
+            try {
+                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
+                const data = await res.json();
+                renderMedications(data.medications || []);
+            } catch (e) {
+                container.innerHTML = '<div style="color: #ef4444;">Error loading medications.</div>';
+            }
+        }
+
+        function renderMedications(meds) {
+            const container = document.getElementById('medsList');
+            container.innerHTML = '';
+            if (meds.length === 0) {
+                container.innerHTML = '<div style="color: var(--text-muted);">No medications found.</div>';
+                return;
+            }
+            meds.forEach((med, index) => {
+                const card = document.createElement('div');
+                card.style.background = 'var(--ai-msg-bg)';
+                card.style.padding = '16px';
+                card.style.borderRadius = '12px';
+                card.style.display = 'flex';
+                card.style.justifyContent = 'space-between';
+                card.style.alignItems = 'center';
+
+                card.innerHTML = `
+                    <div>
+                        <strong style="font-size: 1.1rem; color: var(--primary);">${med.name}</strong>
+                        <div style="color: var(--text-muted); margin-top: 4px;">Dosage: ${med.dosage} | Frequency: ${med.freq}</div>
+                    </div>
+                    <button class="action-btn" onclick="removeMedication(${index})" style="color: #ef4444;" title="Remove">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function addMedication() {
+            if (!userProfile) return;
+            const name = document.getElementById('medName').value.trim();
+            const dosage = document.getElementById('medDosage').value.trim();
+            const freq = document.getElementById('medFreq').value.trim();
+
+            if (!name) {
+                alert("Please enter medication name.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
+                const data = await res.json();
+                const meds = data.medications || [];
+                meds.push({ name, dosage, freq });
+
+                await fetch('/api/medications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id, medications: meds })
+                });
+
+                document.getElementById('medName').value = '';
+                document.getElementById('medDosage').value = '';
+                document.getElementById('medFreq').value = '';
+
+                renderMedications(meds);
+            } catch (e) {
+                alert("Error adding medication.");
+            }
+        }
+
+        async function removeMedication(index) {
+            if (!userProfile) return;
+            try {
+                const res = await fetch(`/api/medications?userId=${userProfile.id}`);
+                const data = await res.json();
+                let meds = data.medications || [];
+                meds.splice(index, 1);
+
+                await fetch('/api/medications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id, medications: meds })
+                });
+
+                renderMedications(meds);
+            } catch (e) {
+                alert("Error removing medication.");
+            }
+        }
+    </script>
 </body>
+
 </html>
