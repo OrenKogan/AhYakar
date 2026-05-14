@@ -665,6 +665,20 @@
         const sidebar = document.getElementById('sidebar');
 
         let userProfile = null;
+        let userLocation = null;
+
+        // ── Geolocation ───────────────────────────────────────────────────────────
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    console.log('[AhYakar] Location acquired:', userLocation);
+                },
+                err => {
+                    console.warn('[AhYakar] Geolocation unavailable:', err.message);
+                }
+            );
+        }
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
@@ -816,7 +830,11 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, userId: userId })
+                    body: JSON.stringify({ 
+                        message: text, 
+                        userId: userId,
+                        location: userLocation 
+                    })
                 });
 
                 const data = await response.json();
@@ -824,18 +842,95 @@
                 // 4. Remove typing indicator and show response
                 document.getElementById(typingId).remove();
 
+                if (data.error) {
+                    appendMessage("⚠️ " + data.error, 'ai');
+                    return;
+                }
+
                 if (data.reply) {
                     const formattedReply = data.reply.replace(/\\n/g, '<br>');
                     appendMessage(formattedReply, 'ai');
+                }
+
+                if (data.requires_confirm) {
+                    appendConfirmButtons(
+                        data.proposal || null,
+                        () => handleConfirm(true),
+                        () => handleConfirm(false)
+                    );
                 } else {
-                    appendMessage("Error: Could not reach the medical database.", 'ai');
+                    // Re-enable input if no confirmation needed
+                    userInput.disabled = false;
+                    sendBtn.disabled = false;
+                    userInput.focus();
                 }
 
             } catch (error) {
-                document.getElementById(typingId).remove();
+                if (document.getElementById(typingId)) document.getElementById(typingId).remove();
                 appendMessage("Connection error. Is the server running?", 'ai');
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+            }
+        }
+
+        function appendConfirmButtons(proposalText, onConfirm, onDecline) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.id = 'confirmWrapper';
+
+            const cardHtml = `
+                <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
+                <div class="message ai-msg" style="width: 100%; border: 1px solid var(--primary); background: #f0fdfa;">
+                    ${proposalText ? `<div style="margin-bottom: 12px; font-weight: 500;">${proposalText.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div style="display: flex; gap: 10px;">
+                        <button class="primary-btn" id="confirmYes" style="margin-top: 0; flex: 1; font-size: 0.9rem;">
+                            <i class="fa-solid fa-calendar-check"></i> Yes, Book
+                        </button>
+                        <button class="primary-btn" id="confirmNo" style="margin-top: 0; flex: 1; font-size: 0.9rem; background: #64748b;">
+                            No Thanks
+                        </button>
+                    </div>
+                </div>
+            `;
+            wrapper.innerHTML = cardHtml;
+            chatBox.appendChild(wrapper);
+            scrollToBottom();
+
+            document.getElementById('confirmYes').onclick = () => {
+                document.getElementById('confirmWrapper').remove();
+                onConfirm();
+            };
+            document.getElementById('confirmNo').onclick = () => {
+                document.getElementById('confirmWrapper').remove();
+                onDecline();
+            };
+        }
+
+        async function handleConfirm(confirmed) {
+            const label = confirmed ? '📅 Yes, find me a doctor' : 'No thanks';
+            appendMessage(label, 'user');
+            
+            const typingId = appendTypingIndicator();
+
+            try {
+                const res = await fetch('/api/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id, confirmed }),
+                });
+                const data = await res.json();
+                
+                document.getElementById(typingId).remove();
+
+                if (data.error) {
+                    appendMessage('⚠️ ' + data.error, 'ai');
+                } else {
+                    appendMessage(data.reply, 'ai');
+                }
+            } catch (err) {
+                if (document.getElementById(typingId)) document.getElementById(typingId).remove();
+                appendMessage('⚠️ Connection error during booking.', 'ai');
             } finally {
-                // Re-enable input
                 userInput.disabled = false;
                 sendBtn.disabled = false;
                 userInput.focus();

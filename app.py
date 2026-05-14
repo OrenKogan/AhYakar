@@ -74,45 +74,18 @@ def home():
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    """
-    Main pipeline endpoint.
-
-    Pipeline:
-        Agent 1 (Intake Analyst)
-          ├─ no_symptoms  → friendly redirect, STOP
-          ├─ home_remedy  → return home remedy advice, STOP
-          ├─ emergency    → direct to ER, STOP
-          └─ escalate     → Agent 2 (Medical Advisor)
-                              ├─ otc            → return OTC advice, STOP
-                              ├─ emergency      → direct to ER, STOP
-                              └─ doctor_needed  → Agent 3 (Appointment Planner)
-                                                    → proposal shown to user
-                                                    → user confirms → Agent 4 (Executor)
-
-    Request body:
-        {
-            "message"    : "...",
-            "session_id" : "uuid",
-            "location"   : { "lat": 32.08, "lng": 34.78 }  (optional)
-        }
-
-    Response body:
-        {
-            "stage"          : "chat" | "home_remedy" | "otc" | "proposal" | "emergency",
-            "reply"          : "message to show the patient",
-            "proposal"       : "appointment proposal text (or null)",
-            "requires_confirm": true | false
-        }
-    """
+    """Main pipeline endpoint."""
     data = request.json or {}
     user_message = (data.get("message") or "").strip()
-    session_id   = (data.get("session_id") or "").strip()
-    location     = data.get("location")  # { lat, lng } or None
+    
+    # Support both session_id (old) and userId (new frontend)
+    session_id = (data.get("userId") or data.get("session_id") or "").strip()
+    location   = data.get("location")
 
     if not user_message:
         return jsonify({"error": "message is required"}), 400
     if not session_id:
-        return jsonify({"error": "session_id is required"}), 400
+        return jsonify({"error": "userId/session_id is required"}), 400
 
     sess = get_session(session_id)
     sess["chat_history"].append({"role": "user", "content": user_message})
@@ -124,83 +97,49 @@ def chat():
         logger.info("[%s] Agent 1 — Intake Analyst", session_id[:8])
         triage = intake_analyst.analyze(client, user_message, sess["chat_history"])
         sess["last_triage"] = triage
-        logger.info("[%s] Triage action: %s", session_id[:8], triage.get("action"))
-
+        
         action1 = triage.get("action", "escalate")
 
-        # No medical symptoms → friendly redirect
         if action1 == "no_symptoms":
-            reply = (
-                "I'm here to help with your health! "
-                "Tell me how you're feeling or describe any symptoms you have."
-            )
+            reply = "I'm here to help with your health! Describe any symptoms you have."
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "chat", "reply": reply,
-                            "proposal": None, "requires_confirm": False})
+            return jsonify({"stage": "chat", "reply": reply, "requires_confirm": False})
 
-        # Home remedy → respond and stop
         if action1 == "home_remedy":
-            reply = triage.get("home_remedy_advice") or (
-                "This sounds like it can be managed at home. "
-                "Drink plenty of fluids, rest, and try hot lemon tea with honey. "
-                "If symptoms persist beyond 2 days or worsen, come back and I'll reassess."
-            )
-            reply += (
-                "\n\n_I am an AI assistant, not a doctor. "
-                "If you feel worse or have any doubts, please see a healthcare professional._"
-            )
+            reply = triage.get("home_remedy_advice") or "This sounds like it can be managed at home with rest and fluids."
+            reply += "\n\n_I am an AI assistant, not a doctor._"
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "home_remedy", "reply": reply,
-                            "proposal": None, "requires_confirm": False})
+            return jsonify({"stage": "home_remedy", "reply": reply, "requires_confirm": False})
 
         # ── Agent 2: Medical Advisor ─────────────────────────────────────────
         logger.info("[%s] Agent 2 — Medical Advisor", session_id[:8])
         advice = medical_advisor.advise(client, triage)
-        logger.info("[%s] Advisor action: %s | diagnosis: %s",
-                    session_id[:8], advice.get("action"), advice.get("diagnosis"))
-
         action2 = advice.get("action", "doctor_needed")
 
-        # Emergency → direct to ER and stop
         if action2 == "emergency":
-            reply = advice.get("reply") or (
-                "🚨 **This sounds like a medical emergency.**\n\n"
-                "Please call emergency services (112 / 911) immediately "
-                "or go to the nearest emergency room.\n\n"
-                "Do not wait — every second counts."
-            )
+            reply = advice.get("reply") or "🚨 **Medical Emergency.** Call 101/911 immediately."
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "emergency", "reply": reply,
-                            "proposal": None, "requires_confirm": False})
+            return jsonify({"stage": "emergency", "reply": reply, "requires_confirm": False})
 
-        # OTC → give advice and stop
         if action2 == "otc":
             reply = advice.get("reply", "")
-            reply += (
-                "\n\n_I am an AI assistant, not a doctor. "
-                "If symptoms persist or worsen, please see a doctor._"
-            )
             sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({"stage": "otc", "reply": reply,
-                            "proposal": None, "requires_confirm": False})
+            return jsonify({"stage": "otc", "reply": reply, "requires_confirm": False})
 
-        # Doctor needed → Appointment Planner asks the single concise question
-        # ── Agent 3: Appointment Planner ─────────────────────────────────────────
+        # Doctor needed → Agent 3: Appointment Planner
         logger.info("[%s] Agent 3 — Appointment Planner", session_id[:8])
-        plan_result         = appointment_planner.plan(client, triage, advice, location)
-        proposal_text       = plan_result.get("proposal_text", "")
-        appointment_details = plan_result.get("appointment_details", {})
-
-        advisor_reply = advice.get("reply", "")
-
-        # Persist context for the Executor
+        plan_result = appointment_planner.plan(client, triage, advice, location)
+        proposal_text = plan_result.get("proposal_text", "")
+        
         sess["pending_action"] = {
-            "appointment_details": appointment_details,
+            "appointment_details": plan_result.get("appointment_details", {}),
             "triage": triage,
         }
 
+        advisor_reply = advice.get("reply", "")
         full_history = advisor_reply + (f"\n\n{proposal_text}" if proposal_text else "")
         sess["chat_history"].append({"role": "assistant", "content": full_history})
+        
         return jsonify({
             "stage": "doctor_needed",
             "reply": advisor_reply,
@@ -215,52 +154,67 @@ def chat():
 
 @app.route("/api/confirm", methods=["POST"])
 def confirm():
-    """
-    Confirmation endpoint — called when the user clicks Confirm or Decline.
-    If confirmed, runs Agent 4 (Executor) to book the appointment.
-
-    Request body:
-        { "session_id": "uuid", "confirmed": true | false }
-
-    Response body:
-        { "stage": "booked" | "declined", "reply": "...", "booking": {...} }
-    """
+    """Confirmation endpoint for booking."""
     data = request.json or {}
-    session_id = (data.get("session_id") or "").strip()
+    session_id = (data.get("userId") or data.get("session_id") or "").strip()
     confirmed  = bool(data.get("confirmed", False))
 
     if not session_id:
-        return jsonify({"error": "session_id is required"}), 400
+        return jsonify({"error": "userId is required"}), 400
 
-    sess    = get_session(session_id)
+    sess = get_session(session_id)
     pending = sess.get("pending_action")
 
     if not pending:
-        return jsonify({"error": "No pending appointment action for this session"}), 400
+        return jsonify({"error": "No pending appointment"}), 400
 
     if not confirmed:
         sess["pending_action"] = None
-        reply = "No problem! Let me know if there's anything else I can help with. 😊"
+        reply = "No problem! Let me know if you need anything else."
         sess["chat_history"].append({"role": "assistant", "content": reply})
-        return jsonify({"stage": "declined", "reply": reply, "booking": None})
+        return jsonify({"stage": "declined", "reply": reply})
 
     # ── Agent 4: Executor ──────────────────────────────────────────────────
-    logger.info("[%s] Agent 4 — Executor", session_id[:8])
     try:
-        get_client()  # validate API key is present
-        result = executor.execute_booking(
-            appointment_details=pending["appointment_details"],
-            patient_context=pending.get("triage", {}),
-        )
+        result = executor.execute_booking(pending["appointment_details"], pending["triage"])
         sess["pending_action"] = None
         reply = result.get("message", "✅ Appointment booked!")
         sess["chat_history"].append({"role": "assistant", "content": reply})
         return jsonify({"stage": "booked", "reply": reply, "booking": result})
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
 
-    except RuntimeError as exc:
-        logger.error("[%s] Executor failed: %s", session_id[:8], exc)
-        return jsonify({"error": str(exc)}), 502
+
+@app.route("/api/history", methods=["GET"])
+def history():
+    """Return chat history for a user."""
+    user_id = request.args.get("userId")
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
+    sess = get_session(user_id)
+    return jsonify({"history": sess["chat_history"]})
+
+
+@app.route("/api/medications", methods=["GET", "POST"])
+def medications():
+    """Handle user medication list."""
+    if request.method == "POST":
+        data = request.json or {}
+        user_id = data.get("userId")
+        meds = data.get("medications", [])
+        if not user_id:
+            return jsonify({"error": "userId required"}), 400
+        sess = get_session(user_id)
+        sess["medications"] = meds
+        return jsonify({"success": True})
+    
+    user_id = request.args.get("userId")
+    if not user_id:
+        return jsonify({"error": "userId required"}), 400
+    sess = get_session(user_id)
+    return jsonify({"medications": sess.get("medications", [])})
 
 
 if __name__ == "__main__":
+    app.run(debug=True, port=5000)
     app.run(debug=True, port=5000)
