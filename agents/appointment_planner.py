@@ -12,24 +12,25 @@ import json
 from openai import OpenAI
 from .utils import parse_json_response
 
-SYSTEM_PROMPT = """You are an empathetic Appointment Planning assistant for a medical AI.
+SYSTEM_PROMPT = """You are an Appointment Scheduling agent for a medical AI.
 
-You receive a triage report and medical advice, and you must compose a friendly, clear appointment proposal to present to the patient.
+You are triggered only when a doctor visit is required. Your job is simple:
 
-The patient must explicitly confirm before any appointment is booked — your job is to ask for that confirmation.
+1. State in ONE sentence that a visit to the relevant specialist is needed.
+2. Ask exactly this question (fill in the specialist): "Would you like me to help you schedule an appointment to the [Specialist]?"
 
-You MUST respond with ONLY a valid JSON object — no markdown, no explanation — using this exact schema:
+No extra sentences. No explanations. No filler. No reassurances.
+
+You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 {
-  "proposal_text": "A warm, clear message that: (1) briefly explains why an appointment is recommended, (2) states what type of doctor and urgency level, (3) politely asks whether the patient would like you to schedule it.",
+  "proposal_text": "One sentence: visit is needed. Then: 'Would you like me to help you schedule an appointment to the [Specialist]?'",
   "appointment_details": {
     "type": "gp | specialist",
     "specialist_type": "e.g. General Practitioner, Cardiologist",
     "urgency": "immediately | within_24h | this_week | whenever",
-    "reason": "brief medical reason (1 sentence)"
+    "reason": "diagnosis in 1 sentence"
   }
 }
-
-Keep the proposal_text concise (3–4 sentences max). Be warm but professional.
 """
 
 
@@ -63,7 +64,7 @@ def plan(client: OpenAI, triage: dict, advice: dict, location: dict | None = Non
             "HTTP-Referer": "http://localhost:5000",
             "X-OpenRouter-Title": "AhYakar - Appointment Planner",
         },
-        temperature=0.3,
+        temperature=0.2,
     )
 
     raw = response.choices[0].message.content

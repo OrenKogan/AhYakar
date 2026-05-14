@@ -580,8 +580,9 @@ async function sendMessage() {
         allDotsDone();
 
         if (data.requires_confirm) {
-            // Show Confirm/Decline buttons — the advisor's reply already contains the question
+            // Show the Appointment Planner's question + Yes/No buttons
             appendConfirmButtons(
+                data.proposal || null,
                 () => handleConfirm(true),
                 () => handleConfirm(false),
             );
@@ -598,13 +599,20 @@ async function sendMessage() {
 }
 
 // ── Confirm/Decline ───────────────────────────────────────────────────────────
-function appendConfirmButtons(onConfirm, onDecline) {
+function appendConfirmButtons(proposalText, onConfirm, onDecline) {
     const row = document.createElement('div');
     row.className = 'row bot';
 
     const card = document.createElement('div');
     card.className = 'confirm-card';
     card.id = 'confirmCard';
+
+    if (proposalText) {
+        const textDiv = document.createElement('div');
+        textDiv.className = 'proposal-text';
+        textDiv.innerHTML = renderText(proposalText);
+        card.appendChild(textDiv);
+    }
 
     const actions = document.createElement('div');
     actions.className = 'confirm-actions';
