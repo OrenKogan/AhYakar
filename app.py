@@ -33,11 +33,6 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 # ── OpenRouter client (lazy-initialized on first request) ──────────────────
 _client: OpenAI | None = None
 
@@ -56,15 +51,6 @@ def get_client() -> OpenAI:
             api_key=api_key,
         )
     return _client
-
-def encode_image_to_base64(path: str) -> str:
-    """Read a local file and return its base64 representation."""
-    try:
-        with open(path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-    except Exception as e:
-        logger.error("Failed to encode image: %s", e)
-        return None
 
 # ── In-memory session store ───────────────────────────────────────────────────
 # Structure: { session_id: { chat_history, pending_action, last_triage } }
@@ -116,21 +102,12 @@ def chat():
     user_id = (data.get("userId") or "").strip()
     session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
     location   = data.get("location")
-    image_url  = data.get("imageUrl") # e.g. "/uploads/xyz.jpg"
+    image_data = data.get("imageData") # Base64 string from client
 
-    if not user_message and not image_url:
+    if not user_message and not image_data:
         return jsonify({"error": "message or image is required"}), 400
     if not session_id:
         return jsonify({"error": "sessionId is required"}), 400
-
-    # Handle Image Data
-    image_data = None
-    if image_url:
-        # Extract filename from URL (e.g. "/uploads/abc.jpg" -> "abc.jpg")
-        filename = os.path.basename(image_url)
-        local_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        if os.path.exists(local_path):
-            image_data = encode_image_to_base64(local_path)
 
     sess = get_session(session_id, user_id)
     sess["chat_history"].append({"role": "user", "content": user_message})
@@ -367,31 +344,6 @@ def medications():
     return jsonify({"medications": udata.get("medications", [])})
 
 
-
-
-@app.route("/api/upload", methods=["POST"])
-def upload_file():
-    """Handle file uploads."""
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    
-    if file:
-        filename = secure_filename(file.filename)
-        unique_filename = f"{uuid.uuid4().hex}_{filename}"
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
-        return jsonify({
-            "success": True, 
-            "filename": filename,
-            "path": unique_filename,
-            "url": f"/uploads/{unique_filename}"
-        })
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route("/api/reset", methods=["POST"])
