@@ -1094,16 +1094,8 @@
 
         function isValidIsraeliID(id) {
             let idStr = String(id).trim();
-            if (idStr.length > 9 || idStr.length < 5 || isNaN(idStr)) return false;
-            // Pad with leading zeros to 9 digits
-            idStr = idStr.padStart(9, '0');
-            let sum = 0;
-            for (let i = 0; i < 9; i++) {
-                let digit = Number(idStr[i]);
-                let step = digit * ((i % 2) + 1);
-                sum += step > 9 ? step - 9 : step;
-            }
-            return sum % 10 === 0;
+            // Relaxed validation for hackathon: just check if it's a number and has reasonable length
+            return idStr.length >= 5 && idStr.length <= 15 && !isNaN(idStr);
         }
 
         function submitDetails() {
@@ -1127,7 +1119,7 @@
                 showError('userId', 'idError', 'Please enter your ID number.');
                 hasError = true;
             } else if (!isValidIsraeliID(id)) {
-                showError('userId', 'idError', 'Please enter a valid Israeli ID number.');
+                showError('userId', 'idError', 'Please enter a valid ID number (5-15 digits).');
                 hasError = true;
             }
 
@@ -1296,8 +1288,8 @@
                     const proposal = data.proposal_text || data.proposal || null;
                     appendConfirmButtons(
                         proposal,
-                        () => handleConfirm(true),
-                        () => handleConfirm(false),
+                        () => handleConfirm(true, data.confirm_type),
+                        () => handleConfirm(false, data.confirm_type),
                         data.confirm_type
                     );
                     userInput.disabled = true;
@@ -1361,38 +1353,38 @@
             };
         }
 
-        async function handleConfirm(confirmed) {
-            const label = confirmed ? '📅 Yes, find me an appointment' : 'No thanks';
+        async function handleConfirm(confirmed, confirmType) {
+            let label = 'No thanks';
+            if (confirmed) {
+                label = (confirmType === 'med_search') ? '🔍 Yes, search for medications' : '📅 Yes, find me an appointment';
+            }
             appendMessage(label, 'user');
 
             const typingId = appendTypingIndicator();
 
-            // Update typing messages for pharmacy search (Now in English)
+            // Status messages for pharmacy search
             const pharmacyMsgs = [
                 { ms: 2000, text: "Scanning pharmacy websites..." },
                 { ms: 6000, text: "Extracting prices with Vision AI..." },
                 { ms: 12000, text: "Comparing best deals..." },
                 { ms: 18000, text: "Almost there..." },
             ];
-            const timers = pharmacyMsgs.map(step =>
-                setTimeout(() => {
-                    const statusEl = document.getElementById(`${typingId}-status`);
-                    if (statusEl) statusEl.textContent = step.text;
-                }, step.ms)
-            );
 
-            // Update status messages for the scan phase (takes longer)
+            // Status messages for appointment scan
             const scanStatuses = [
                 { ms: 2000, text: "Opening the portal..." },
                 { ms: 5000, text: "Logging in..." },
                 { ms: 9000, text: "Scanning available appointments..." },
                 { ms: 15000, text: "Collecting time slots..." },
             ];
-            const timers = scanStatuses.map(s =>
+
+            const activeStatuses = (confirmType === 'med_search') ? pharmacyMsgs : scanStatuses;
+
+            const allTimers = activeStatuses.map(step =>
                 setTimeout(() => {
-                    const el = document.getElementById(`${typingId}-status`);
-                    if (el) el.textContent = s.text;
-                }, s.ms)
+                    const statusEl = document.getElementById(`${typingId}-status`);
+                    if (statusEl) statusEl.textContent = step.text;
+                }, step.ms)
             );
 
             try {
@@ -1403,8 +1395,7 @@
                 });
                 const data = await res.json();
 
-                timers.forEach(t => clearTimeout(t));
-                timers.forEach(t => clearTimeout(t));
+                allTimers.forEach(t => clearTimeout(t));
                 document.getElementById(typingId).remove();
 
                 if (data.error) {
@@ -1426,7 +1417,7 @@
                     document.getElementById('attachBtn').disabled = false;
                 }
             } catch (err) {
-                timers.forEach(t => clearTimeout(t));
+                allTimers.forEach(t => clearTimeout(t));
                 if (document.getElementById(typingId)) document.getElementById(typingId).remove();
                 appendMessage('⚠️ Connection error during scan.', 'ai');
                 userInput.disabled = false;
@@ -1513,94 +1504,6 @@
                     appendMessage(data.reply, 'ai');
                 }
             } catch (err) {
-                timers.forEach(t => clearTimeout(t));
-                if (document.getElementById(typingId)) document.getElementById(typingId).remove();
-                appendMessage('⚠️ Connection error during scan.', 'ai');
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                document.getElementById('attachBtn').disabled = false;
-            }
-        }
-
-        function appendChoiceCards(options) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'message-wrapper ai';
-            wrapper.id = 'choiceWrapper';
-
-            const icons = ['🏥', '🩺', '📋'];
-            const cardsHtml = options.map((opt, i) => `
-                <div id="choice-card-${i}" onclick="handleChoice(${i})" style="
-                    cursor: pointer;
-                    border: 1.5px solid var(--border-color);
-                    border-radius: 14px;
-                    padding: 16px 18px;
-                    margin-bottom: 10px;
-                    background: var(--bg-main);
-                    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-                    display: flex; align-items: center; gap: 14px;
-                " onmouseover="this.style.borderColor='var(--primary)';this.style.boxShadow='0 4px 16px rgba(13,148,136,0.15)';this.style.background='rgba(13,148,136,0.05)'"
-                   onmouseout="this.style.borderColor='var(--border-color)';this.style.boxShadow='none';this.style.background='var(--bg-main)'">
-                    <div style="font-size: 2rem; min-width: 44px; text-align:center;">${icons[i]}</div>
-                    <div style="flex:1;">
-                        <div style="font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom:3px;">${opt.doctor}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom:2px;"><i class="fa-solid fa-location-dot" style="color:var(--primary);margin-right:5px;"></i>${opt.clinic}</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-regular fa-calendar" style="color:var(--primary);margin-right:5px;"></i>${opt.date} &nbsp;<i class="fa-regular fa-clock" style="color:var(--primary);margin-right:5px;"></i>${opt.time}</div>
-                    </div>
-                    <div style="font-size: 1.3rem; color: var(--primary);"><i class="fa-solid fa-chevron-right"></i></div>
-                </div>
-            `).join('');
-
-            wrapper.innerHTML = `
-                <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
-                <div class="message ai-msg" style="width:100%; padding:20px; border:1.5px solid var(--primary); border-radius:20px; background:rgba(13,148,136,0.04);">
-                    <div style="font-weight:600; margin-bottom:14px; font-size:1rem;">🗓️ Here are the available appointments I found. Pick one to confirm:</div>
-                    ${cardsHtml}
-                </div>
-            `;
-            chatBox.appendChild(wrapper);
-            scrollToBottom();
-        }
-
-        async function handleChoice(choiceIdx) {
-            // Remove choice cards
-            const cw = document.getElementById('choiceWrapper');
-            if (cw) cw.remove();
-
-            // Show user selection
-            appendMessage(`✅ Option ${choiceIdx + 1} selected — booking now...`, 'user');
-
-            const typingId = appendTypingIndicator();
-            const bookStatuses = [
-                { ms: 2000, text: "Reopening the portal..." },
-                { ms: 6000, text: "Logging in..." },
-                { ms: 10000, text: "Navigating to your doctor..." },
-                { ms: 16000, text: "Confirming the time slot..." },
-            ];
-            const timers = bookStatuses.map(s =>
-                setTimeout(() => {
-                    const el = document.getElementById(`${typingId}-status`);
-                    if (el) el.textContent = s.text;
-                }, s.ms)
-            );
-
-            try {
-                const res = await fetch('/api/choose', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userProfile.id, sessionId: currentSessionId, choice: choiceIdx }),
-                });
-                const data = await res.json();
-
-                timers.forEach(t => clearTimeout(t));
-                document.getElementById(typingId).remove();
-
-                if (data.error) {
-                    appendMessage('⚠️ ' + data.error, 'ai');
-                } else {
-                    appendMessage(data.reply, 'ai');
-                }
-            } catch (err) {
-                timers.forEach(t => clearTimeout(t));
                 if (document.getElementById(typingId)) document.getElementById(typingId).remove();
                 appendMessage('⚠️ Connection error.', 'ai');
             } finally {
