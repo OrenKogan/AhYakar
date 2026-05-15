@@ -20,6 +20,7 @@ only reliable pattern when calling from synchronous Flask code.
 import asyncio
 import json
 import re
+import time
 from browser_use import Agent, BrowserProfile, BrowserSession
 from browser_use.llm.openai.chat import ChatOpenAI
 import logging
@@ -44,8 +45,9 @@ def _make_llm() -> ChatOpenAI:
     )
 
 def _make_profile() -> BrowserProfile:
-    """Speed-tuned profile with WSL/Linux rendering flags."""
+    """Headless, speed-tuned profile with WSL/Linux rendering flags."""
     return BrowserProfile(
+        headless=True,   # Works with use_vision=False — no screenshot rendering needed
         args=[
             "--disable-gpu",
             "--no-sandbox",
@@ -68,7 +70,7 @@ async def _run_agent(task: str, max_steps: int = 20) -> str:
         flash_mode=True,
         max_actions_per_step=5,
         max_steps=max_steps,
-        use_vision=True,
+        use_vision=False,   # DOM-based navigation — no screenshots, faster + headless-compatible
     )
     try:
         result = await agent.run()
@@ -156,6 +158,9 @@ def execute_choice(chosen_option: dict, specialist_type: str, flask_session_id: 
     Opens a fresh browser, logs in, books, closes when done.
     """
     logger.info("[Executor] Phase 2 — Booking: %s", chosen_option)
+    # Wait briefly for Phase 1's event loop watchdogs to fully clean up
+    # before we start a new asyncio.run(). This prevents QueueShutDown crashes.
+    time.sleep(3)
     try:
         # Use simple string replace (not .format) to avoid conflicts with JSON braces
         prompt = (
@@ -170,18 +175,19 @@ def execute_choice(chosen_option: dict, specialist_type: str, flask_session_id: 
         if not final_output:
             raise RuntimeError("Agent completed without confirming the booking.")
 
-        confirmation_id = f"MAC-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        raw_date = chosen_option.get("date", "")
+        raw_time = chosen_option.get("time", "")
+        try:
+            from datetime import datetime as _dt
+            d = _dt.strptime(raw_date, "%Y-%m-%d")
+            display_date = f"{d.day}.{d.month}"
+        except Exception:
+            display_date = raw_date
+
         return {
             "success": True,
-            "confirmation_id": confirmation_id,
-            "message": (
-                f"✅ Appointment confirmed!\n\n"
-                f"**Doctor:** {chosen_option.get('doctor', 'N/A')}\n"
-                f"**Clinic:** {chosen_option.get('clinic', 'N/A')}\n"
-                f"**Date & Time:** {chosen_option.get('date', '')} at {chosen_option.get('time', '')}\n\n"
-                f"**Confirmation ID:** {confirmation_id}\n\n"
-                f"_{final_output}_"
-            ),
+            "confirmation_id": f"MAC-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+            "message": f"\u2705 Booked: {chosen_option.get('doctor', '')}  {raw_time}  {display_date}  \u2014  {chosen_option.get('clinic', '')}",
         }
     except Exception as exc:
         logger.error("[Executor] Booking failed: %s", exc)

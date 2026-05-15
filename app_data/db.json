@@ -618,6 +618,320 @@
         "medications": []
       },
       "title": "Stomach flu symptoms"
+    },
+    "1778804695764crw6m7": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your 3-day history of stomach ache, diarrhea, and fever, it's important to see a doctor to determine the exact cause and ensure proper treatment. While it could be a common viral gastroenteritis, a doctor can rule out bacterial infections or food poisoning that might require specific care. Would you like me to help you book an appointment with a general practitioner?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The symptoms are highly suggestive of acute gastroenteritis, likely viral, but bacterial causes or food poisoning cannot be ruled out."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever, lasting for 3 days, which warrants escalation."
+        }
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever, lasting for 3 days, which warrants escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach flu, gastroenteritis."
+    },
+    "1778805210684bzdrq7": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms have persisted for 3 days and include fever, it's best to see a doctor to determine the exact cause and ensure proper treatment. They can rule out bacterial infections or other conditions that might require specific medical intervention. Would you like me to help you book an appointment?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 10:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 11:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Appointment confirmed!\n\n**Doctor:** Dr. Noa Shapiro\n**Clinic:** Haifa Bay Clinic\n**Date & Time:** 2026-05-15 at 11:30\n\n**Confirmation ID:** MAC-20260515033751\n\n_The appointment with Dr. Noa Shapiro at Haifa Bay Clinic on 2026-05-15 at 11:30 has been successfully booked. The confirmation message is visible on the screen, indicating the booking was completed as requested._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which is beyond simple home care."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute gastrointestinal illness"
+    },
+    "1778805739684dg222q": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "sore throat small fever"
+        },
+        {
+          "role": "assistant",
+          "content": "To give you the best advice, I need a bit more information. How long have you been experiencing the sore throat and fever? Knowing the duration will help determine if a doctor's visit is necessary. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "Based on your symptoms of a sore throat and low-grade fever for two days, it's most likely you have Viral Pharyngitis. You can manage your symptoms with over-the-counter pain relievers and self-care. Take Acetaminophen (Tylenol) 500mg every 4-6 hours as needed for pain and fever, or Ibuprofen (Advil/Motrin) 200-400mg every 4-6 hours as needed. Also, make sure to get plenty of rest and drink warm liquids like tea with honey to soothe your throat. If your symptoms worsen, develop a high fever, or don't improve after 3-5 days, please consider seeing a doctor. I am an AI, not a licensed doctor."
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "sore throat",
+          "fever"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a sore throat and fever lasting 2 days, which is beyond the typical duration for simple home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "sore throat",
+          "small fever",
+          "fever"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Sore throat, fever"
+    },
+    "17788058505844eskdb": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach ache, diarrhea, and fever persisting for 3 days, it's important to see a doctor to determine the exact cause and ensure proper treatment. While it could be viral gastroenteritis, bacterial infections or food poisoning also need to be ruled out. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Appointment confirmed!\n\n**Doctor:** Dr. Noa Shapiro\n**Clinic:** Haifa Bay Clinic\n**Date & Time:** 2026-05-15 at 08:30\n\n**Confirmation ID:** MAC-20260515034914\n\n_The appointment with Dr. Noa Shapiro at Haifa Bay Clinic on 2026-05-15 at 08:30 has been successfully booked. The confirmation message is visible on the screen, confirming the booking._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which is beyond simple home care."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute gastroenteritis"
+    },
+    "1778808137637u1yf3c": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a headache, behide the eyes"
+        },
+        {
+          "role": "assistant",
+          "content": "To give you the best advice, I need a little more information about your headache. Could you tell me how long you've had this headache, how severe it is on a scale of 1-10, and if you have any other symptoms like fever, nausea, sensitivity to light or sound, or changes in your vision? I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "3, nothing else"
+        },
+        {
+          "role": "assistant",
+          "content": "Rest in a quiet, dark room, apply a cold compress to your forehead, and stay hydrated. If the headache persists or worsens, please consult a doctor.\n\n_I am an AI assistant, not a doctor._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "home_remedy",
+        "home_remedy_advice": "Rest in a quiet, dark room, apply a cold compress to your forehead, and stay hydrated. If the headache persists or worsens, please consult a doctor.",
+        "symptoms": [
+          "headache behind the eyes"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a mild headache behind the eyes with no other symptoms, suggesting it can be managed with home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "headache",
+          "pain behind the eyes",
+          "headache behind the eyes"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Headache behind eyes"
+    },
+    "1778808280706zlsfid": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "sore throat, 38C for 2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing viral pharyngitis. For your sore throat and fever, I recommend taking acetaminophen (Tylenol) as directed on the package for pain and fever relief. You can also try gargling with warm salt water to soothe your throat. Ensure you get plenty of rest and stay hydrated. If your symptoms worsen or do not improve within 3-5 days, please consider seeing a doctor. I am an AI, not a licensed doctor."
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "sore throat",
+          "fever (38C)"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient has a sore throat and a fever of 38C for 2 days, which is beyond simple home care."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "sore throat",
+          "fever (38C)"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Sore throat, fever (2 days)"
+    },
+    "1778808327766y2q04t": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach ache, diarrhea, and fever persisting for 3 days, it's important to see a doctor to determine the exact cause and ensure proper treatment. This could be acute gastroenteritis, which can be viral or bacterial, or food poisoning. Would you like me to help you book an appointment?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Booked: Dr. Sarah Cohen  08:00  15.5  —  Tel Aviv Central Clinic"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute gastroenteritis"
     }
   },
   "user_sessions": {
@@ -631,7 +945,14 @@
       "17788030360644w4bod",
       "1778803460469domxvj",
       "1778803915584pr1ffy",
-      "1778804116057uiv63c"
+      "1778804116057uiv63c",
+      "1778804695764crw6m7",
+      "1778805210684bzdrq7",
+      "1778805739684dg222q",
+      "17788058505844eskdb",
+      "1778808137637u1yf3c",
+      "1778808280706zlsfid",
+      "1778808327766y2q04t"
     ]
   },
   "user_data": {
@@ -655,6 +976,14 @@
         },
         {
           "text": "Acetaminophen (Tylenol) 500mg",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Ibuprofen (Advil/Motrin) 200-400mg",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Acetaminophen (Tylenol) as directed on package",
           "date": "May 15, 2026"
         }
       ]
