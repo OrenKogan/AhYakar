@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +34,7 @@
             height: 100vh;
             display: flex;
             overflow: hidden;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
                 radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.1) 0%, transparent 50%);
         }
@@ -72,12 +73,13 @@
             border: 1px solid transparent;
         }
 
-        .nav-item:hover, .nav-item.active {
+        .nav-item:hover,
+        .nav-item.active {
             color: var(--primary);
             background: rgba(14, 165, 233, 0.1);
             border-color: rgba(14, 165, 233, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
         /* Main Layout */
@@ -139,8 +141,15 @@
         }
 
         @keyframes scan {
-            0%, 100% { top: 10%; }
-            50% { top: 90%; }
+
+            0%,
+            100% {
+                top: 10%;
+            }
+
+            50% {
+                top: 90%;
+            }
         }
 
         .vision-status {
@@ -150,7 +159,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85rem;
@@ -170,9 +179,20 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* Controls */
@@ -216,9 +236,17 @@
         }
 
         @keyframes record-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
-            70% { box-shadow: 0 0 0 20px rgba(244, 63, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(244, 63, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+            }
         }
 
         /* Chat Section */
@@ -257,8 +285,14 @@
             gap: 15px;
         }
 
-        .chat-box::-webkit-scrollbar { width: 4px; }
-        .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .chat-box::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
 
         .message-wrapper {
             display: flex;
@@ -268,12 +302,24 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .message-wrapper.user { align-self: flex-end; }
-        .message-wrapper.ai { align-self: flex-start; }
+        .message-wrapper.user {
+            align-self: flex-end;
+        }
+
+        .message-wrapper.ai {
+            align-self: flex-start;
+        }
 
         .message {
             padding: 12px 18px;
@@ -302,7 +348,9 @@
             padding: 0 5px;
         }
 
-        .user .message-time { text-align: right; }
+        .user .message-time {
+            text-align: right;
+        }
 
         .input-area {
             padding: 20px;
@@ -352,7 +400,7 @@
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
             padding: 15px 30px;
             border-radius: 20px;
@@ -381,12 +429,25 @@
             animation: bounce 1.4s infinite ease-in-out;
         }
 
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
 
         @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
         }
 
         /* Recognition UI */
@@ -396,7 +457,7 @@
             gap: 5px;
             height: 20px;
         }
-        
+
         .bar {
             width: 3px;
             background: var(--primary);
@@ -422,18 +483,28 @@
         }
 
         @keyframes flash {
-            0% { opacity: 0; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0; }
+            0% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 0;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <aside class="sidebar">
         <div class="logo"><i class="fa-solid fa-hand-holding-medical"></i></div>
         <div class="nav-item active" title="Vision AI"><i class="fa-solid fa-eye"></i></div>
-        <div class="nav-item" title="Chat History" onclick="window.location.href='/'"><i class="fa-solid fa-message"></i></div>
+        <div class="nav-item" title="Chat History" onclick="window.location.href='/'"><i
+                class="fa-solid fa-message"></i></div>
         <div class="nav-item" title="Profile"><i class="fa-solid fa-user-doctor"></i></div>
         <div style="flex: 1;"></div>
         <div class="nav-item" title="Settings"><i class="fa-solid fa-gear"></i></div>
@@ -487,7 +558,8 @@
                 <div class="message-wrapper ai">
                     <div class="message">
                         Hello! I am your AhYakar Vision Assistant. I can see you and listen to your concerns. <br><br>
-                        <strong>How are you feeling today?</strong> You can describe your symptoms or just show me what's bothering you.
+                        <strong>How are you feeling today?</strong> You can describe your symptoms or just show me
+                        what's bothering you.
                     </div>
                     <div class="message-time">Just now</div>
                 </div>
@@ -532,7 +604,7 @@
                 recognition = new SpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = true;
-                recognition.lang = 'en-US';
+                recognition.lang = 'he-IL';
 
                 recognition.onstart = () => {
                     isListening = true;
@@ -580,7 +652,7 @@
             if (recognition) {
                 try {
                     recognition.start();
-                } catch(e) { console.error(e); }
+                } catch (e) { console.error(e); }
             } else {
                 appendMessage("system", "Speech recognition not supported in this browser.");
             }
@@ -605,10 +677,10 @@
         async function processInput(text) {
             appendMessage("user", text);
             const typingId = appendTyping();
-            
+
             // Capture image from webcam
             const imageData = captureFrame();
-            
+
             // Visual Flash
             flash.classList.add('flash-anim');
             setTimeout(() => flash.classList.remove('flash-anim'), 500);
@@ -712,14 +784,14 @@
         function appendMessage(sender, text) {
             const wrapper = document.createElement('div');
             wrapper.className = `message-wrapper ${sender}`;
-            
+
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
+
             wrapper.innerHTML = `
                 <div class="message">${text.replace(/\n/g, '<br>')}</div>
                 <div class="message-time">${time}</div>
             `;
-            
+
             chatBox.appendChild(wrapper);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -763,4 +835,5 @@
         initSpeech();
     </script>
 </body>
+
 </html>
