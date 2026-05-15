@@ -292,7 +292,7 @@ def chat():
 
 @app.route("/api/confirm", methods=["POST"])
 def confirm():
-    """Confirmation endpoint for booking."""
+    """Confirmation endpoint — Phase 1: scan portal and return appointment options."""
     data = request.json or {}
     user_id = (data.get("userId") or "").strip()
     session_id = (data.get("sessionId") or user_id or data.get("session_id") or "").strip()
@@ -313,9 +313,69 @@ def confirm():
         sess["chat_history"].append({"role": "assistant", "content": reply})
         return jsonify({"stage": "declined", "reply": reply})
 
-    # ── Agent 4: Executor ──────────────────────────────────────────────────
+    # ── Phase 1: Scan the portal and return 3 options ─────────────────────────
     try:
-        result = executor.execute_booking(pending["appointment_details"], pending["triage"])
+        scan_result = executor.scan_appointments(pending["appointment_details"], session_id)
+        options = scan_result.get("options", [])
+        specialist_type = scan_result.get("specialist_type", "Family Doctor")
+
+        if not options:
+            raise RuntimeError("No appointment slots found on the portal.")
+
+        # Store the scan result so Phase 2 can use it
+        sess["pending_action"]["scanned_options"] = options
+        sess["pending_action"]["specialist_type"] = specialist_type
+
+        option_lines = "\n".join(
+            f"**Option {i+1}:** {o.get('doctor')} — {o.get('clinic')} — {o.get('date')} at {o.get('time')}"
+            for i, o in enumerate(options)
+        )
+        reply = f"I found the following available appointments:\n\n{option_lines}\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        sess["chat_history"].append({"role": "assistant", "content": reply})
+
+        return jsonify({
+            "stage": "choose_appointment",
+            "reply": reply,
+            "options": options,
+        })
+
+    except Exception as exc:
+        return jsonify({"error": str(exc)}), 500
+
+
+@app.route("/api/choose", methods=["POST"])
+def choose():
+    """Phase 2: Book the specific appointment option the user selected."""
+    data = request.json or {}
+    user_id    = (data.get("userId") or "").strip()
+    session_id = (data.get("sessionId") or user_id or "").strip()
+    choice_idx = data.get("choice")  # 0-based index
+
+    if not session_id:
+        return jsonify({"error": "sessionId is required"}), 400
+    if choice_idx is None:
+        return jsonify({"error": "choice index is required"}), 400
+
+    sess = get_session(session_id, user_id)
+    pending = sess.get("pending_action")
+    if not pending:
+        return jsonify({"error": "No pending appointment scan"}), 400
+
+    options = pending.get("scanned_options", [])
+    specialist_type = pending.get("specialist_type", "Family Doctor")
+
+    try:
+        choice_idx = int(choice_idx)
+    except (TypeError, ValueError):
+        return jsonify({"error": "choice must be an integer"}), 400
+
+    if choice_idx < 0 or choice_idx >= len(options):
+        return jsonify({"error": f"Invalid choice. Choose between 0 and {len(options)-1}"}), 400
+
+    chosen = options[choice_idx]
+
+    try:
+        result = executor.execute_choice(chosen, specialist_type, session_id)
         sess["pending_action"] = None
         reply = result.get("message", "✅ Appointment booked!")
         sess["chat_history"].append({"role": "assistant", "content": reply})

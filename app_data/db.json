@@ -1,0 +1,663 @@
+{
+  "sessions": {
+    "1778800924903hcntg5": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have shoulder pain for the last 5 days and every time my arm moves it really hurts"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your shoulder pain has persisted for 5 days and is significantly worsened by arm movement, it's best to have it evaluated by a doctor to determine the exact cause and ensure proper treatment. In the meantime, you can try to reduce pain and inflammation with over-the-counter pain relievers. Would you like me to help you book an appointment with a general practitioner? I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Appointment booked successfully via AI Visual Agent!\n\n**Details:**\nThe appointment with Dr. Sarah Cohen has been successfully booked and confirmed. The doctor is located at Tel Aviv Central Clinic. The booking process is complete as per the requirements.\n\n**Confirmation ID:** MAC-202605150223\n\n_(Executed autonomously against the KupatHolim portal)_"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "shoulder pain",
+          "pain with arm movement"
+        ],
+        "duration": "5 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports shoulder pain for 5 days that is exacerbated by arm movement, indicating a need for further evaluation beyond home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "shoulder pain",
+          "pain with arm movement"
+        ],
+        "duration": "5 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Shoulder Pain with Arm Movement"
+    },
+    "1778802016963urnmw9": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have shoulder pain for the last 5 days and every time my arm moves it really hurts"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your shoulder pain has lasted for 5 days and is significantly impacting your arm movement, it's important to have it evaluated by a doctor to get a proper diagnosis and treatment plan. This will help determine the exact cause and prevent it from worsening. Would you like me to help you book an appointment?\n\nA visit to an Orthopedic Specialist or General Practitioner is needed. Would you like me to help you schedule an appointment to the Orthopedic Specialist or General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Roni Friedman — Sport & Bone Clinic — 2026-05-15 at 08:00 AM\n**Option 2:** Dr. Shlomo Birnbaum — Hadassah Orthopedics — 2026-05-15 at 08:00 AM\n**Option 3:** Dr. Tali Rotem — Haifa Bone Center — 2026-05-15 at 13:00 PM\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "specialist",
+          "specialist_type": "Orthopedic Specialist or General Practitioner",
+          "urgency": "this_week",
+          "reason": "Shoulder pain for 5 days exacerbated by arm movement."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "shoulder pain",
+            "pain with arm movement"
+          ],
+          "duration": "5 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports shoulder pain for 5 days that is exacerbated by arm movement, indicating a need for professional assessment."
+        },
+        "scanned_options": [
+          {
+            "doctor": "Dr. Roni Friedman",
+            "clinic": "Sport & Bone Clinic",
+            "date": "2026-05-15",
+            "time": "08:00 AM"
+          },
+          {
+            "doctor": "Dr. Shlomo Birnbaum",
+            "clinic": "Hadassah Orthopedics",
+            "date": "2026-05-15",
+            "time": "08:00 AM"
+          },
+          {
+            "doctor": "Dr. Tali Rotem",
+            "clinic": "Haifa Bone Center",
+            "date": "2026-05-15",
+            "time": "13:00 PM"
+          }
+        ],
+        "specialist_type": "Orthopedic Specialist or General Practitioner"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "shoulder pain",
+          "pain with arm movement"
+        ],
+        "duration": "5 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports shoulder pain for 5 days that is exacerbated by arm movement, indicating a need for professional assessment."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "shoulder pain",
+          "pain with arm movement"
+        ],
+        "duration": "5 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute shoulder pain with movement"
+    },
+    "1778802271994pkbxuq": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have 38 C very bad headache"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your fever of 38°C and very bad headache, it's important to gather more information to understand the cause. Could you please tell me how long you've had these symptoms? Also, are you experiencing any other symptoms like neck stiffness, sensitivity to light, confusion, or any unusual weakness or numbness? This additional information will help determine the best course of action. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "40 C"
+        },
+        {
+          "role": "assistant",
+          "content": "Your symptoms, including a high fever of 40 C and a very bad headache, are concerning and require immediate medical attention. These could indicate a serious condition that needs urgent diagnosis and treatment. Please go to the nearest emergency room immediately."
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "40 C fever"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a high fever of 40 C, which requires immediate medical attention."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "fever (38 C)",
+          "very bad headache",
+          "40 C fever"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Fever, severe headache"
+    },
+    "177880236550569y49j": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a rash on my left arm"
+        },
+        {
+          "role": "assistant",
+          "content": "To help me understand your rash better and provide the best advice, could you please tell me more about it? Specifically, I need to know: How long have you had the rash? Does it itch, hurt, or have any other sensations? Can you describe what it looks like (e.g., red, bumpy, scaly, blistering)? Have you been in contact with anything unusual recently, like new soaps, plants, or insects? I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "maybe some plants"
+        },
+        {
+          "role": "assistant",
+          "content": "It sounds like you might have contact dermatitis, possibly from touching certain plants. To help with the rash, you can apply a 1% hydrocortisone cream to the affected area twice daily. Keep the area clean and avoid scratching. If the rash worsens, spreads, or doesn't improve within 3-5 days, please consider seeing a doctor. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "what if its allergys"
+        },
+        {
+          "role": "assistant",
+          "content": "You likely have Allergic Contact Dermatitis from plant exposure. To help manage the rash, apply a 1% hydrocortisone cream to the affected area twice daily. You can also take an oral antihistamine like cetirizine (Zyrtec) 10 mg once daily to help with itching. Avoid scratching the rash and try to identify and avoid the plant that caused the reaction. If the rash does not improve within 3-5 days, or if it worsens, spreads, or you develop signs of infection, you should see a doctor. I am an AI, not a licensed doctor."
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "rash on left arm",
+          "possible allergic reaction"
+        ],
+        "duration": "unknown",
+        "relevant_history": "possible plant exposure",
+        "reasoning": "The user is concerned about a possible allergic reaction, which warrants escalation beyond simple home remedies, especially without knowing the severity or type of allergy."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "rash on left arm",
+          "maybe some plants",
+          "possible allergic reaction"
+        ],
+        "duration": "unknown",
+        "relevant_history": "possible plant exposure",
+        "medications": []
+      },
+      "title": "Left arm rash"
+    },
+    "1778802467496pdhw59": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "my stomach hurts for 3 days"
+        },
+        {
+          "role": "assistant",
+          "content": "To give you the best advice, I need a little more information about your stomach pain. Could you tell me more about where exactly it hurts, what the pain feels like (e.g., sharp, dull, cramping), if anything makes it better or worse, and if you have any other symptoms like nausea, vomiting, diarrhea, constipation, or fever? This will help me understand what might be going on. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "cramping, diarrhea"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach pain, cramping, and diarrhea persisting for 3 days, it's important to see a doctor to get a proper diagnosis and rule out any more serious conditions. While it's likely acute gastroenteritis, a doctor can provide guidance and ensure you're not dehydrated. Would you like me to help you book an appointment?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "Acute Gastroenteritis (viral or bacterial) is the most likely cause of your stomach pain, cramping, and diarrhea."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach pain",
+            "cramping",
+            "diarrhea"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports stomach cramping and diarrhea lasting for 3 days, which goes beyond simple home care."
+        }
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach pain",
+          "cramping",
+          "diarrhea"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports stomach cramping and diarrhea lasting for 3 days, which goes beyond simple home care."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach pain",
+          "cramping",
+          "diarrhea"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach pain, 3 days."
+    },
+    "1778802918261skdoz1": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a bad stomach ache with diarrhea"
+        },
+        {
+          "role": "assistant",
+          "content": "To give you the best advice, I need a bit more information about your symptoms. Could you please tell me how long you've had the stomach ache and diarrhea, and if you have any other symptoms like fever, vomiting, or blood in your stool?"
+        },
+        {
+          "role": "user",
+          "content": "3 days maybe a little fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach ache, diarrhea, and a fever for three days, it's best to see a doctor to ensure proper diagnosis and rule out any bacterial infections or other concerns. In the meantime, focus on staying hydrated by drinking plenty of clear fluids like water, broth, or oral rehydration solutions. You can take Acetaminophen (Tylenol) 500mg, 1-2 tablets every 4-6 hours as needed for fever and pain, not exceeding 4000mg in 24 hours. I can go ahead and book an appointment for you if you'd like. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The patient is likely experiencing Acute Gastroenteritis, an infection of the stomach and intestines."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports a stomach ache, diarrhea, and a little fever lasting for 3 days, which warrants escalation beyond home remedies."
+        }
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a stomach ache, diarrhea, and a little fever lasting for 3 days, which warrants escalation beyond home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "bad stomach ache",
+          "diarrhea",
+          "stomach ache",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach Ache & Diarrhea"
+    },
+    "17788030360644w4bod": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "To give you the best advice, I need a bit more information. Could you please tell me how long you've been experiencing these symptoms (stomach ache, diarrhea, and fever)? Knowing the duration will help determine the best course of action. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "3 days"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach ache, diarrhea, and fever have persisted for 3 days, it's advisable to see a doctor to rule out bacterial causes or other complications. They can provide a more definitive diagnosis and treatment plan. In the meantime, focus on hydration. You can take Acetaminophen (Tylenol) 500mg, 1-2 tablets every 4-6 hours as needed for fever and pain, not exceeding 4000mg in 24 hours. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed to address your symptoms. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 09:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 10:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 11:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The patient is experiencing acute gastroenteritis with stomach ache, diarrhea, and fever for 3 days."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports stomach ache, diarrhea, and fever lasting for 3 days, which is beyond the scope of home remedies."
+        },
+        "scanned_options": [
+          {
+            "doctor": "Dr. Sarah Cohen",
+            "clinic": "Tel Aviv Central Clinic",
+            "date": "2026-05-15",
+            "time": "09:00"
+          },
+          {
+            "doctor": "Dr. Moshe Levi",
+            "clinic": "Jerusalem North Clinic",
+            "date": "2026-05-15",
+            "time": "10:00"
+          },
+          {
+            "doctor": "Dr. Noa Shapiro",
+            "clinic": "Haifa Bay Clinic",
+            "date": "2026-05-15",
+            "time": "11:30"
+          }
+        ],
+        "specialist_type": "General Practitioner"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports stomach ache, diarrhea, and fever lasting for 3 days, which is beyond the scope of home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "bad stomach ache",
+          "diarrhea",
+          "fever",
+          "stomach ache"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach flu symptoms."
+    },
+    "1778803460469domxvj": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms have persisted for 3 days, it's best to see a doctor to determine the exact cause of your gastroenteritis and ensure you receive appropriate care. They can rule out bacterial infections or other conditions that might require specific treatment. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 09:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 10:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The patient is likely experiencing acute gastroenteritis, which is an inflammation of the stomach and intestines, often caused by a viral or bacterial infection."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+        },
+        "scanned_options": [
+          {
+            "doctor": "Dr. Sarah Cohen",
+            "clinic": "Tel Aviv Central Clinic",
+            "date": "2026-05-15",
+            "time": "09:00"
+          },
+          {
+            "doctor": "Dr. Moshe Levi",
+            "clinic": "Jerusalem North Clinic",
+            "date": "2026-05-15",
+            "time": "10:00"
+          },
+          {
+            "doctor": "Dr. Noa Shapiro",
+            "clinic": "Haifa Bay Clinic",
+            "date": "2026-05-15",
+            "time": "08:30"
+          }
+        ],
+        "specialist_type": "General Practitioner"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Flu-like stomach bug"
+    },
+    "1778803915584pr1ffy": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Given your symptoms of stomach ache, diarrhea, and fever persisting for 3 days, it's important to see a doctor to determine the exact cause and ensure proper management. You should focus on staying hydrated by drinking plenty of fluids like water, clear broths, or oral rehydration solutions. Please avoid solid foods for a few hours and then gradually reintroduce bland foods like toast or rice. I can help you book an appointment if you'd like. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The patient is likely experiencing acute gastroenteritis, possibly viral or bacterial, or food poisoning."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+        }
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach flu symptoms"
+    },
+    "1778804116057uiv63c": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "Based on your symptoms of stomach ache, diarrhea, and fever for three days, it's best to see a doctor to determine the exact cause and ensure proper treatment. You should focus on staying hydrated by drinking plenty of fluids like water, clear broths, or oral rehydration solutions. Avoid solid foods for a few hours and then gradually introduce bland foods like toast or rice. I can help you book an appointment if you'd like. I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 11:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Appointment confirmed!\n\n**Doctor:** Dr. Moshe Levi\n**Clinic:** Jerusalem North Clinic\n**Date & Time:** 2026-05-15 at 09:00\n\n**Confirmation ID:** MAC-20260515031811\n\n_The appointment with Dr. Moshe Levi has been successfully booked for 2026-05-15 at 09:00 at the Jerusalem North Clinic. The booking confirmation is visible on the screen._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach flu symptoms"
+    }
+  },
+  "user_sessions": {
+    "215912296": [
+      "1778800924903hcntg5",
+      "1778802016963urnmw9",
+      "1778802271994pkbxuq",
+      "177880236550569y49j",
+      "1778802467496pdhw59",
+      "1778802918261skdoz1",
+      "17788030360644w4bod",
+      "1778803460469domxvj",
+      "1778803915584pr1ffy",
+      "1778804116057uiv63c"
+    ]
+  },
+  "user_data": {
+    "215912296": {
+      "medications": [
+        {
+          "text": "Ibuprofen (Advil, Motrin) 400mg every 4-6 hours as needed, not to exceed 1200mg in 24 hours, with food.",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Ibuprofen 400mg every 4-6 hours as needed for pain and inflammation",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Hydrocortisone 1% cream (apply twice daily)",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Cetirizine (Zyrtec) 10 mg (take once daily)",
+          "date": "May 15, 2026"
+        },
+        {
+          "text": "Acetaminophen (Tylenol) 500mg",
+          "date": "May 15, 2026"
+        }
+      ]
+    }
+  }
+}
