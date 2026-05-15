@@ -1419,7 +1419,11 @@
             } catch (err) {
                 allTimers.forEach(t => clearTimeout(t));
                 if (document.getElementById(typingId)) document.getElementById(typingId).remove();
-                appendMessage('⚠️ Connection error during scan.', 'ai');
+                
+                const errorMsg = (confirmType === 'med_search') 
+                    ? '⚠️ Connection error while searching pharmacies. Please try again.'
+                    : '⚠️ Connection error during scan. Please try again.';
+                appendMessage(errorMsg, 'ai');
                 userInput.disabled = false;
                 sendBtn.disabled = false;
                 document.getElementById('attachBtn').disabled = false;

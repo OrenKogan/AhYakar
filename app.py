@@ -345,10 +345,35 @@ def confirm():
         med_name = pending.get("med_name", "Medication")
         sess["pending_action"] = None
         
-        # Run vision-based scraper
+        # Run vision-based scraper in a thread with a fresh event loop
         from pharmacy_scraper import scrape_all_pharmacies, PHARMACY_SITES
+        import threading
+        
+        def _run_scraper_in_thread(med_name):
+            res_holder = []
+            err_holder = []
+            def _target():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    res = loop.run_until_complete(scrape_all_pharmacies(med_name))
+                    res_holder.append(res)
+                except Exception as e:
+                    err_holder.append(e)
+                finally:
+                    loop.close()
+            
+            t = threading.Thread(target=_target, daemon=True)
+            t.start()
+            t.join(timeout=90)
+            if err_holder:
+                raise err_holder[0]
+            if not res_holder:
+                raise RuntimeError("Scraper thread timed out or failed to return")
+            return res_holder[0]
+
         try:
-            results, pharmacy_screenshots = asyncio.run(scrape_all_pharmacies(med_name))
+            results, pharmacy_screenshots = _run_scraper_in_thread(med_name)
             in_stock = [r for r in results if r.get("price", 0) > 0]
 
             # Build search-page URLs for all known pharmacies

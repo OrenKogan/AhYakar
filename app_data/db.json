@@ -1,0 +1,591 @@
+{
+  "sessions": {
+    "1778813096430g8oety": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of bad stomach ache, diarrhea, fever"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing acute gastroenteritis. Given your symptoms have persisted for 3 days and include fever, it is recommended to see a doctor for a proper evaluation. Would you like me to book an appointment for you? I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Booked: Dr. Noa Shapiro  08:30  15.5  —  Haifa Bay Clinic"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever, which have persisted for 3 days, indicating a need for escalation beyond home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Abdominal pain, diarrhea, fever."
+    },
+    "1778813649709fm5ms1": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "my head hurts, behinde the eyes"
+        },
+        {
+          "role": "assistant",
+          "content": "To help determine the best course of action, could you please tell me how long you've had this headache?"
+        },
+        {
+          "role": "user",
+          "content": "1 day"
+        },
+        {
+          "role": "assistant",
+          "content": "Your headache behind the eyes is most likely due to eyestrain or a tension-type headache. You should rest your eyes, take Acamol (500mg every 4-6 hours as needed, do not exceed 4000mg in 24 hours), and ensure you are well-hydrated. I am an AI, not a licensed doctor.\n\nWould you like me to search local Israeli pharmacies for the best deal on אקמול?"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "headache behind the eyes"
+        ],
+        "duration": "1 day",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a headache behind the eyes for one day, which could indicate a more significant issue than a simple home remedy can address."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "headache behind the eyes"
+        ],
+        "duration": "1 day",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Headache behind eyes"
+    },
+    "1778813767548xsjrry": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "my throat is sore"
+        },
+        {
+          "role": "assistant",
+          "content": "Try gargling with salt water and drinking warm liquids like tea with honey.\n\n_I am an AI assistant, not a doctor._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "home_remedy",
+        "home_remedy_advice": "Try gargling with salt water and drinking warm liquids like tea with honey.",
+        "symptoms": [
+          "sore throat"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a sore throat, which can often be managed with home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "sore throat"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Sore Throat Complaint"
+    },
+    "1778813928659djkd8c": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a bad headache behinde the eyes"
+        },
+        {
+          "role": "assistant",
+          "content": "To help me understand your headache better, could you please tell me how long you've had this headache, how severe it is on a scale of 1-10, and if you have any other symptoms like sensitivity to light or sound, nausea, or changes in your vision? I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "4, no other symptoms"
+        },
+        {
+          "role": "assistant",
+          "content": "Try resting in a quiet, dark room, applying a cold compress to your forehead, and staying hydrated. If the headache persists or worsens, please seek medical attention.\n\n_I am an AI assistant, not a doctor._"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "home_remedy",
+        "home_remedy_advice": "Try resting in a quiet, dark room, applying a cold compress to your forehead, and staying hydrated. If the headache persists or worsens, please seek medical attention.",
+        "symptoms": [
+          "headache behind the eyes"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "reasoning": "The patient reports a headache behind the eyes with no other symptoms and a severity of 4, suggesting it can be managed with home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "bad headache behind the eyes",
+          "headache behind the eyes"
+        ],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Headache behind eyes"
+    },
+    "1778814022166020tuf": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a fever, caugh and my head hurts"
+        },
+        {
+          "role": "assistant",
+          "content": "To provide the best recommendation, please tell me how long you have had these symptoms. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing an Upper Respiratory Tract Infection (URTI). To manage your symptoms, take Acamol (500mg) 1-2 tablets every 4-6 hours as needed for fever and headache, not exceeding 8 tablets in 24 hours. Ensure you get plenty of rest and stay well-hydrated. I am an AI, not a licensed doctor.\n\nWould you like me to search local Israeli pharmacies for the best deal on אקמול?"
+        }
+      ],
+      "pending_action": {
+        "type": "med_search",
+        "med_name": "אקמול"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports fever, cough, and headache for 2 days, which warrants escalation beyond home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Flu-like symptoms"
+    },
+    "test": {
+      "chat_history": [],
+      "pending_action": null,
+      "last_triage": null,
+      "patient_profile": {
+        "symptoms": [],
+        "duration": "unknown",
+        "relevant_history": "none",
+        "medications": []
+      }
+    },
+    "1778814643014mqiyk1": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a fever, caugh and my head hurts"
+        },
+        {
+          "role": "assistant",
+          "content": "To provide the best recommendation, please tell me how long you have been experiencing these symptoms. I am an AI, not a licensed doctor."
+        },
+        {
+          "role": "user",
+          "content": "2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing a Viral Upper Respiratory Tract Infection. To manage your symptoms, you can take Acamol (500mg, 1-2 tablets every 4-6 hours as needed for fever and headache, not exceeding 4g in 24 hours) and ensure you get plenty of rest and stay well-hydrated. I am an AI, not a licensed doctor.\n\nWould you like me to search local Israeli pharmacies for the best deal on אקמול?"
+        }
+      ],
+      "pending_action": {
+        "type": "med_search",
+        "med_name": "אקמול"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports fever, cough, and headache lasting for 2 days, which warrants escalation beyond home remedies."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Fever, cough, headache"
+    },
+    "17788151362209kcqrn": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a fever, caugh and my head hurts for 2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "You likely have a Viral Upper Respiratory Tract Infection. To manage your symptoms, take Acamol (500mg, 1-2 tablets every 4-6 hours as needed for fever and headache) and ensure you get plenty of rest and stay hydrated. I am an AI, not a licensed doctor.\n\nWould you like me to search local Israeli pharmacies for the best deal on אקמול?"
+        },
+        {
+          "role": "assistant",
+          "content": "מצאתי את המחירים הבאים עבור **אקמול** בבתי המרקחת:"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including fever, cough, and headache lasting for two days, which warrants escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Flu-like symptoms"
+    },
+    "1778815355349mbqaev": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "i have a fever, caugh and my head hurts for 2 days"
+        },
+        {
+          "role": "assistant",
+          "content": "You likely have an Upper Respiratory Tract Infection (URTI). To manage your symptoms, take Acamol (500mg) 1-2 tablets every 4-6 hours as needed for fever and headache, not exceeding 4000mg in 24 hours. Ensure you get plenty of rest and stay well-hydrated. I am an AI, not a licensed doctor.\n\nWould you like me to search local Israeli pharmacies for the best deal on אקמול?"
+        },
+        {
+          "role": "assistant",
+          "content": "מצאתי את המחירים הבאים עבור **אקמול** בבתי המרקחת:"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including fever, cough, and headache lasting for 2 days, which warrants escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "fever",
+          "cough",
+          "headache"
+        ],
+        "duration": "2 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Flu-like symptoms, two days."
+    },
+    "1778815743507ov41ri": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 days of stomach ache, diahrria and fever"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing acute gastroenteritis. Given your symptoms have persisted for 3 days and include fever, it is recommended to see a doctor for a proper evaluation. Would you like me to help you book an appointment with a General Practitioner? I am an AI, not a licensed doctor.\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 09:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The patient is most likely experiencing acute gastroenteritis, likely viral in origin."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+        },
+        "scanned_options": [
+          {
+            "doctor": "Dr. Sarah Cohen",
+            "clinic": "Tel Aviv Central Clinic",
+            "date": "2026-05-15",
+            "time": "09:00"
+          },
+          {
+            "doctor": "Dr. Moshe Levi",
+            "clinic": "Jerusalem North Clinic",
+            "date": "2026-05-15",
+            "time": "09:00"
+          },
+          {
+            "doctor": "Dr. Noa Shapiro",
+            "clinic": "Haifa Bay Clinic",
+            "date": "2026-05-15",
+            "time": "08:30"
+          }
+        ],
+        "specialist_type": "General Practitioner"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports stomach ache, diarrhea, and fever lasting for 3 days, which requires escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute Gastroenteritis"
+    },
+    "177881629470657mr5p": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 day stomach ache, diahrria and fever"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing acute viral gastroenteritis. Given your symptoms have persisted for 3 days, it is recommended to see a doctor for further evaluation. Would you like me to book an appointment for you?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 10:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 09:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        }
+      ],
+      "pending_action": {
+        "appointment_details": {
+          "type": "gp",
+          "specialist_type": "General Practitioner",
+          "urgency": "within_24h",
+          "reason": "The most probable diagnosis is acute viral gastroenteritis."
+        },
+        "triage": {
+          "has_symptoms": true,
+          "action": "escalate",
+          "home_remedy_advice": null,
+          "symptoms": [
+            "stomach ache",
+            "diarrhea",
+            "fever"
+          ],
+          "duration": "3 days",
+          "relevant_history": "none",
+          "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which warrants escalation."
+        },
+        "scanned_options": [
+          {
+            "doctor": "Dr. Sarah Cohen",
+            "clinic": "Tel Aviv Central Clinic",
+            "date": "2026-05-15",
+            "time": "08:00"
+          },
+          {
+            "doctor": "Dr. Moshe Levi",
+            "clinic": "Jerusalem North Clinic",
+            "date": "2026-05-15",
+            "time": "10:00"
+          },
+          {
+            "doctor": "Dr. Noa Shapiro",
+            "clinic": "Haifa Bay Clinic",
+            "date": "2026-05-15",
+            "time": "09:30"
+          }
+        ],
+        "specialist_type": "General Practitioner"
+      },
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever lasting for 3 days, which warrants escalation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Stomach Flu/Gastroenteritis"
+    },
+    "17788168715459lrqfa": {
+      "chat_history": [
+        {
+          "role": "user",
+          "content": "3 day stomach ache, diahrria and fever"
+        },
+        {
+          "role": "assistant",
+          "content": "You are likely experiencing acute gastroenteritis. Given your symptoms have persisted for 3 days, it is recommended to see a doctor for further evaluation. Would you like me to book an appointment for you?\n\nA visit to a General Practitioner is needed. Would you like me to help you schedule an appointment to the General Practitioner?"
+        },
+        {
+          "role": "assistant",
+          "content": "I found the following available appointments:\n\n**Option 1:** Dr. Sarah Cohen — Tel Aviv Central Clinic — 2026-05-15 at 08:00\n**Option 2:** Dr. Moshe Levi — Jerusalem North Clinic — 2026-05-15 at 09:00\n**Option 3:** Dr. Noa Shapiro — Haifa Bay Clinic — 2026-05-15 at 08:30\n\nWhich option would you like to book? (Reply 1, 2, or 3)"
+        },
+        {
+          "role": "assistant",
+          "content": "✅ Booked: Dr. Moshe Levi  09:00  15.5  —  Jerusalem North Clinic"
+        }
+      ],
+      "pending_action": null,
+      "last_triage": {
+        "has_symptoms": true,
+        "action": "escalate",
+        "home_remedy_advice": null,
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "reasoning": "The patient reports multiple symptoms including stomach ache, diarrhea, and fever, lasting for 3 days, which requires further medical evaluation."
+      },
+      "patient_profile": {
+        "symptoms": [
+          "stomach ache",
+          "diarrhea",
+          "fever"
+        ],
+        "duration": "3 days",
+        "relevant_history": "none",
+        "medications": []
+      },
+      "title": "Acute GI Bug"
+    }
+  },
+  "user_sessions": {
+    "215912296": [
+      "1778813096430g8oety",
+      "1778813649709fm5ms1",
+      "1778813767548xsjrry",
+      "1778813928659djkd8c",
+      "1778814022166020tuf",
+      "1778814643014mqiyk1",
+      "17788151362209kcqrn",
+      "1778815355349mbqaev",
+      "1778815743507ov41ri",
+      "177881629470657mr5p",
+      "17788168715459lrqfa"
+    ],
+    "test": [
+      "test"
+    ]
+  },
+  "user_data": {
+    "215912296": {
+      "medications": [
+        {
+          "text": "אקמול",
+          "date": "May 15, 2026"
+        }
+      ]
+    }
+  }
+}

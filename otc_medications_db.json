@@ -1,0 +1,236 @@
+[
+    {
+        "product_name": "אקמול טבע קפליות 500 מ\"ג",
+        "quantity": "10 קפליות",
+        "price": 11.51,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול צינון ושפעת לילה 14 ACAMOL NIGHT",
+        "quantity": "14",
+        "price": 12.2,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול טבליות 20 טבליות Acamol",
+        "quantity": "20",
+        "price": 12.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול משכך כאבים ומוריד חום",
+        "quantity": "20 טבליות",
+        "price": 14.24,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול 14 קפליות Acamol",
+        "quantity": "14",
+        "price": 15.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול קפליות 500 מ\"ג",
+        "quantity": "14 קפליות",
+        "price": 16.11,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול 21 קפליות Acamol",
+        "quantity": "21",
+        "price": 16.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול 16 קפליות ACAMOL To Go",
+        "quantity": "16",
+        "price": 17.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול קפליות פראצטמול 500 מ\"ג TO-GO",
+        "quantity": "16 קפליות",
+        "price": 19.32,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אבקמולי לילדים גדולים 250 מ\"ג אבקת Acamoli Forte בטעם תות וניל",
+        "quantity": "250 מ\"ג",
+        "price": 19.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמולי שקיות אבקמולי לילדים 250 מ\"ג",
+        "quantity": "10 שקיות",
+        "price": 22.19,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול טבע קפליות 500 מ\"ג",
+        "quantity": "500 מ\"ג",
+        "price": 23.0,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אבקמול גרנולות בטעם תות-Acamoli",
+        "quantity": null,
+        "price": 25.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול טבע קפליות 500 מ\"ג",
+        "quantity": "30 קפליות",
+        "price": 25.94,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול שקיות אבקמול 500 מ\"ג",
+        "quantity": "10 שקיות",
+        "price": 28.84,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמולי פורטה תות סירופ 100 מ\"ל",
+        "quantity": "100 מ\"ל",
+        "price": 32.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמולי פורטה 250 מ\"ג/5 מ\"ל סירופ בטעם תותי פרוטי",
+        "quantity": "250 מ\"ג/5 מ\"ל",
+        "price": 32.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול 50 קפליות Acamol",
+        "quantity": "50",
+        "price": 36.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול פוקוס 30 קפליות Acamol Focus",
+        "quantity": "30",
+        "price": 36.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמולי פורטה סירופ בטעם תותי פרוטי 250 מ\"ג",
+        "quantity": "100 מל",
+        "price": 38.93,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמולי פורטה בטעם תות שדה 250 מ\"ג",
+        "quantity": "100 מל",
+        "price": 38.93,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול טבע קפליות משכך כאבים ומוריד חום 500MG",
+        "quantity": "50 קפליות",
+        "price": 40.58,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "ACAMOL FOCUS קפליות להקלה במיגרנה",
+        "quantity": "30 קפליות",
+        "price": 42.37,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "אקמול צינון ליקויג'ל לטיפול ביום ובלילה",
+        "quantity": null,
+        "price": 45.9,
+        "pharmacy": "E-Pharma",
+        "url": "https://www.epharma.co.il/search?q=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/e-pharma_041066d0.png"
+    },
+    {
+        "product_name": "אקמול צינון ליקוויג'ל יום ובלילה",
+        "quantity": "30 כמוסות לטיפול ביום + 10 כמוסות לטיפול בלילה",
+        "price": 51.34,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    },
+    {
+        "product_name": "ACAMOL FOCUS קפליות להקלה במיגרנה",
+        "quantity": "50 קפליות",
+        "price": 59.9,
+        "pharmacy": "Super-Pharm",
+        "url": "https://shop.super-pharm.co.il/search?av=%D7%90%D7%A7%D7%9E%D7%95%D7%9C",
+        "is_in_stock": true,
+        "screenshot_path": "/uploads/search_results/super-pharm_e4762bea.png"
+    }
+]

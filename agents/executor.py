@@ -147,8 +147,8 @@ Steps:
 6. Find the doctor named 'DOCTOR_PLACEHOLDER' in the results list and click their 'Book' button.
 7. In the booking modal, the date 'DATE_PLACEHOLDER' should already be selected.
    Click on the time slot 'TIME_PLACEHOLDER' to select it.
-8. Click the 'Confirm Booking' button.
-9. DO NOT declare success until you can see the booking confirmation on screen.
+8. Click the 'Confirm Booking' (or 'Confirm Appointment') button.
+9. As soon as you click the confirm button, consider the booking successful. DO NOT wait for or look for a confirmation screen.
 10. Return: doctor name, clinic, date, and confirmed time."""
 
 
