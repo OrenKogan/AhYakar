@@ -48,7 +48,7 @@ async def run_browser_agent(specialist_type: str, urgency: str) -> str:
 
     task_prompt = (
         f"You are an autonomous medical booking agent. Your strict task is to book a '{specialist_type}' appointment.\n"
-        f"1. Go to http://127.0.0.1:7800/.\n"
+        f"1. Go to http://127.0.0.1:7999/.\n"
         f"2. You MUST log in. Type 'a@gmail.com' into the email input, type '123123' into the password input, and click the Login button.\n"
         f"3. Wait for the dashboard to load, then click on the 'Find Doctors' navigation tab.\n"
         f"4. Find the specialty filters and click the pill that best matches '{specialist_type}'.\n"
