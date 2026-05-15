@@ -30,7 +30,7 @@ import os
 logger = logging.getLogger(__name__)
 
 # Portal credentials
-PORTAL_URL      = "http://127.0.0.1:7800/"
+PORTAL_URL      = "http://127.0.0.1:7999/"
 PORTAL_EMAIL    = "a@gmail.com"
 PORTAL_PASSWORD = "abcd23asd12"
 
@@ -86,7 +86,7 @@ async def _run_agent(task: str, max_steps: int = 20) -> str:
 
 SCAN_PROMPT_TEMPLATE = """You are a medical appointment scanner.
 
-1. Go to http://127.0.0.1:7800/
+1. Go to http://127.0.0.1:7999/
 2. Log in: email = 'a@gmail.com', password = 'abcd23asd12'. Click Login.
 3. Navigate to the 'Find Doctors' tab.
 4. Click the specialty filter pill that best matches 'SPECIALTY_PLACEHOLDER'.
@@ -139,7 +139,7 @@ Book this SPECIFIC appointment:
   - Specialty: SPECIALTY_PLACEHOLDER
 
 Steps:
-1. Go to http://127.0.0.1:7800/
+1. Go to http://127.0.0.1:7999/
 2. Log in: email = 'a@gmail.com', password = 'abcd23asd12'. Click Login.
 3. Wait for the dashboard to load.
 4. Click the 'Find Doctors' navigation tab.
