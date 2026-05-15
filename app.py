@@ -13,6 +13,7 @@ and persisted in localStorage for the duration of the tab/conversation.
 """
 
 import os
+import asyncio
 import logging
 from dotenv import load_dotenv
 
@@ -246,13 +247,40 @@ def chat():
 
         if action2 == "otc":
             reply = advice.get("reply", "")
-            sess["chat_history"].append({"role": "assistant", "content": reply})
-            return jsonify({
-                "stage": "otc", 
-                "reply": reply, 
-                "requires_confirm": False,
-                "thoughts": { "intake": triage, "advisor": advice }
-            })
+            if meds:
+                raw_med_name = meds[0] if isinstance(meds[0], str) else meds[0].get("text")
+                # Try to find dosage in the AI reply to include in search
+                import re
+                dosage_match = re.search(r'(\d+\s*mg)', advice.get("reply", ""), re.IGNORECASE)
+                dosage = dosage_match.group(1) if dosage_match else ""
+                
+                # Clean up: use only the brand name for better compatibility across pharmacies
+                med_name = raw_med_name.split('/')[0].split(' or ')[0].split(' and ')[0].split(' או ')[0].strip()
+                search_query = med_name.strip()
+                
+                proposal_text = f"Would you like me to search local Israeli pharmacies for the best deal on {search_query}?"
+                sess["pending_action"] = {
+                    "type": "med_search",
+                    "med_name": search_query
+                }
+                full_history = reply + f"\n\n{proposal_text}"
+                sess["chat_history"].append({"role": "assistant", "content": full_history})
+                return jsonify({
+                    "stage": "otc", 
+                    "reply": reply,
+                    "proposal_text": proposal_text,
+                    "requires_confirm": True,
+                    "confirm_type": "med_search",
+                    "thoughts": { "intake": triage, "advisor": advice }
+                })
+            else:
+                sess["chat_history"].append({"role": "assistant", "content": reply})
+                return jsonify({
+                    "stage": "otc", 
+                    "reply": reply, 
+                    "requires_confirm": False,
+                    "thoughts": { "intake": triage, "advisor": advice }
+                })
 
         if action2 == "more_info_needed":
             reply = advice.get("reply", "")
@@ -305,7 +333,96 @@ def confirm():
     pending = sess.get("pending_action")
 
     if not pending:
-        return jsonify({"error": "No pending appointment"}), 400
+        return jsonify({"error": "No pending action"}), 400
+
+    if pending.get("type") == "med_search":
+        if not confirmed:
+            sess["pending_action"] = None
+            reply = "No problem! Let me know if you need anything else."
+            sess["chat_history"].append({"role": "assistant", "content": reply})
+            return jsonify({"stage": "declined", "reply": reply})
+        
+        med_name = pending.get("med_name", "Medication")
+        sess["pending_action"] = None
+        
+        # Run vision-based scraper
+        from pharmacy_scraper import scrape_all_pharmacies, PHARMACY_SITES
+        try:
+            results, pharmacy_screenshots = asyncio.run(scrape_all_pharmacies(med_name))
+            in_stock = [r for r in results if r.get("price", 0) > 0]
+
+            # Build search-page URLs for all known pharmacies
+            pharmacy_search_urls = {p['name']: p['url_template'].format(query=med_name) for p in PHARMACY_SITES}
+
+            # Cheapest per pharmacy (results already sorted by price ascending)
+            cheapest_per_pharmacy: dict = {}
+            for r in in_stock:
+                ph = r.get('pharmacy', '')
+                if ph not in cheapest_per_pharmacy:
+                    cheapest_per_pharmacy[ph] = r
+
+            # Overall winner
+            winner_pharmacy = in_stock[0].get('pharmacy', '') if in_stock else None
+            winner_price    = in_stock[0].get('price', 0)     if in_stock else None
+            winner_name     = in_stock[0].get('product_name', med_name) if in_stock else None
+
+            # Build rows for ALL pharmacies (found or not), sorted cheapest first
+            pharmacy_rows = []
+            found_sorted = sorted(cheapest_per_pharmacy.items(), key=lambda x: x[1]['price'])
+            found_names  = [ph for ph, _ in found_sorted]
+
+            # First add found pharmacies (sorted by price)
+            for ph, item in found_sorted:
+                is_winner = ph == winner_pharmacy
+                pharmacy_rows.append({
+                    "name":         ph,
+                    "product_name": item.get('product_name', med_name),
+                    "quantity":     item.get('quantity', 'N/A'),
+                    "price":        item.get('price', 0),
+                    "url":          pharmacy_search_urls.get(ph, '#') if is_winner else None,
+                    "screenshot_url": pharmacy_screenshots.get(ph),
+                    "is_winner":    is_winner,
+                    "found":        True,
+                })
+
+            # Then add pharmacies with no results
+            for p in PHARMACY_SITES:
+                if p['name'] not in found_names:
+                    pharmacy_rows.append({
+                        "name":         p['name'],
+                        "product_name": None,
+                        "quantity":     None,
+                        "price":        None,
+                        "url":          None,
+                        "screenshot_url": pharmacy_screenshots.get(p['name']),
+                        "is_winner":    False,
+                        "found":        False,
+                    })
+
+            if in_stock:
+                reply = f"מצאתי את המחירים הבאים עבור **{med_name}** בבתי המרקחת:"
+            else:
+                reply = f"חיפשתי בבתי המרקחת אך לא מצאתי תוצאות עבור **{med_name}** כרגע."
+
+            sess["chat_history"].append({"role": "assistant", "content": reply})
+            return jsonify({
+                "stage": "med_search_complete",
+                "reply": reply,
+                "pharmacy_results": {
+                    "med_name":        med_name,
+                    "winner_pharmacy": winner_pharmacy,
+                    "winner_price":    winner_price,
+                    "winner_product":  winner_name,
+                    "rows":            pharmacy_rows,
+                } if pharmacy_rows else None
+            })
+
+        except Exception as e:
+            logger.error(f"Vision search failed: {e}")
+            reply = f"אירעה שגיאה בחיפוש בבתי המרקחת. נסה שוב."
+            
+        sess["chat_history"].append({"role": "assistant", "content": reply})
+        return jsonify({"stage": "med_search_complete", "reply": reply})
 
     if not confirmed:
         sess["pending_action"] = None
@@ -315,7 +432,7 @@ def confirm():
 
     # ── Agent 4: Executor ──────────────────────────────────────────────────
     try:
-        result = executor.execute_booking(pending["appointment_details"], pending["triage"])
+        result = executor.execute_booking(pending.get("appointment_details", {}), pending.get("triage", {}))
         sess["pending_action"] = None
         reply = result.get("message", "✅ Appointment booked!")
         sess["chat_history"].append({"role": "assistant", "content": reply})

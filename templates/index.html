@@ -11,6 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         :root {
@@ -580,6 +582,200 @@
             .message-wrapper {
                 max-width: 100%;
             }
+            /* Pharmacy Result Card Styling */
+            .message.assistant .markdown-content h3 {
+                color: #2ecc71;
+                margin-bottom: 10px;
+                font-size: 1.2rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .message.assistant .markdown-content p {
+                margin: 5px 0;
+            }
+            .message.assistant .markdown-content a {
+                color: #3498db;
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.2s;
+            }
+            .message.assistant .markdown-content a:hover {
+                color: #2980b9;
+                text-decoration: underline;
+            }
+        /* ── Pharmacy Comparison Card (Premium Design) ───────────────────── */
+        .pharm-card-wrap {
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            direction: rtl;
+            font-family: 'Inter', sans-serif;
+            margin-top: 15px;
+            animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .pharm-card-header {
+            background: linear-gradient(145deg, #0d9488 0%, #0891b2 100%);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .pharm-card-header-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(4px);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .pharm-card-title {
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.01em;
+        }
+        .pharm-card-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.8rem;
+            margin-top: 2px;
+            font-weight: 500;
+        }
+        .pharm-card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--sidebar-bg);
+        }
+        .pharm-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 18px;
+            border: 1px solid var(--border-color);
+            background: rgba(var(--ai-msg-bg-rgb), 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .pharm-row.clickable {
+            cursor: pointer;
+        }
+        .pharm-row.clickable:hover {
+            transform: scale(1.02);
+            background: var(--ai-msg-bg);
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+        }
+        .pharm-row.pharm-winner {
+            background: linear-gradient(135deg, rgba(13, 148, 136, 0.08), rgba(8, 145, 178, 0.05));
+            border-color: rgba(13, 148, 136, 0.4);
+            box-shadow: 0 2px 10px rgba(13, 148, 136, 0.1);
+        }
+        .pharm-row.pharm-winner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0.6;
+        }
+        .pharm-medal {
+            font-size: 1.6rem;
+            flex-shrink: 0;
+            width: 32px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        .pharm-info {
+            flex: 1;
+            min-width: 0;
+            text-align: right;
+        }
+        .pharm-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+        .pharm-product {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+        .pharm-right {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .pharm-price {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+        .pharm-winner .pharm-price {
+            color: var(--primary);
+        }
+        .pharm-link-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+        }
+        .pharm-row.pharm-not-found {
+            opacity: 0.6;
+            filter: grayscale(0.8);
+            border-style: dashed;
+        }
+        .pharm-card-footer {
+            padding: 12px 20px 16px;
+            background: rgba(var(--ai-msg-bg-rgb), 0.3);
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .pharm-card-footer i {
+            color: var(--primary);
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -992,11 +1188,16 @@
                 }
 
                 if (data.requires_confirm) {
+                    const proposal = data.proposal_text || data.proposal || null;
                     appendConfirmButtons(
-                        data.proposal || null,
+                        proposal,
                         () => handleConfirm(true),
-                        () => handleConfirm(false)
+                        () => handleConfirm(false),
+                        data.confirm_type
                     );
+                    userInput.disabled = true;
+                    sendBtn.disabled = true;
+                    document.getElementById('attachBtn').disabled = true;
                 } else {
                     // Re-enable input if no confirmation needed
                     userInput.disabled = false;
@@ -1014,18 +1215,26 @@
             }
         }
 
-        function appendConfirmButtons(proposalText, onConfirm, onDecline) {
+        function appendConfirmButtons(proposalText, onConfirm, onDecline, confirmType) {
             const wrapper = document.createElement('div');
             wrapper.className = 'message-wrapper ai';
             wrapper.id = 'confirmWrapper';
+
+            let yesText = "Yes, Book Appointment";
+            let icon = "fa-calendar-check";
+            
+            if (confirmType === "med_search") {
+                yesText = "Yes, Search Pharmacies";
+                icon = "fa-magnifying-glass";
+            }
 
             const cardHtml = `
                 <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
                 <div class="message ai-msg" style="width: 100%; border: 1px solid var(--primary); background: rgba(13, 148, 136, 0.05); padding: 24px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
                     ${proposalText ? `<div style="margin-bottom: 20px; font-size: 1rem; line-height: 1.6; color: var(--text-main); font-weight: 500;">${proposalText.replace(/\n/g, '<br>')}</div>` : ''}
-                    <div style="display: flex; gap: 12px;">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                         <button class="btn-action btn-confirm" id="confirmYes">
-                            <i class="fa-solid fa-calendar-check"></i> Yes, Book Appointment
+                            <i class="fa-solid ${icon}"></i> ${yesText}
                         </button>
                         <button class="btn-action btn-decline" id="confirmNo">
                             No Thanks
@@ -1048,10 +1257,24 @@
         }
 
         async function handleConfirm(confirmed) {
-            const label = confirmed ? '📅 Yes, find me a doctor' : 'No thanks';
+            const label = confirmed ? 'Yes, please search' : 'No thanks';
             appendMessage(label, 'user');
 
             const typingId = appendTypingIndicator();
+
+            // Update typing messages for pharmacy search (Now in English)
+            const pharmacyMsgs = [
+                { ms: 2000, text: "Scanning pharmacy websites..." },
+                { ms: 6000, text: "Extracting prices with Vision AI..." },
+                { ms: 12000, text: "Comparing best deals..." },
+                { ms: 18000, text: "Almost there..." },
+            ];
+            const timers = pharmacyMsgs.map(step =>
+                setTimeout(() => {
+                    const statusEl = document.getElementById(`${typingId}-status`);
+                    if (statusEl) statusEl.textContent = step.text;
+                }, step.ms)
+            );
 
             try {
                 const res = await fetch('/api/confirm', {
@@ -1061,22 +1284,179 @@
                 });
                 const data = await res.json();
 
+                timers.forEach(t => clearTimeout(t));
                 document.getElementById(typingId).remove();
 
                 if (data.error) {
                     appendMessage('⚠️ ' + data.error, 'ai');
+                } else if (data.pharmacy_results) {
+                    appendMessage(data.reply, 'ai');
+                    appendPharmacyCard(data.pharmacy_results);
                 } else {
                     appendMessage(data.reply, 'ai');
                 }
             } catch (err) {
                 if (document.getElementById(typingId)) document.getElementById(typingId).remove();
-                appendMessage('⚠️ Connection error during booking.', 'ai');
+                appendMessage('⚠️ Connection error.', 'ai');
             } finally {
                 userInput.disabled = false;
                 sendBtn.disabled = false;
                 userInput.focus();
             }
         }
+
+        function appendPharmacyCard(results) {
+            const isDark = document.body.classList.contains('dark-mode');
+
+            // Detect theme colors
+            const cardBg    = isDark ? '#1e293b' : '#ffffff';
+            const rowBg     = isDark ? '#0f172a' : '#f8fafc';
+            const rowBorder = isDark ? '#334155' : '#e2e8f0';
+            const textMain  = isDark ? '#f8fafc'  : '#1e293b';
+            const textMuted = isDark ? '#94a3b8'  : '#64748b';
+            const teal      = '#0d9488';
+            const tealDim   = isDark ? 'rgba(13,148,136,0.15)' : 'rgba(13,148,136,0.08)';
+            const tealBorder = 'rgba(13,148,136,0.45)';
+
+            const medals = ['🥇', '🥈', '🥉'];
+
+            const rowsHtml = results.rows.map((r, i) => {
+                const medal    = medals[i] || '🏅';
+                const isWinner = r.is_winner;
+                const found    = r.found;
+
+                const bg     = isWinner ? tealDim  : rowBg;
+                const border = isWinner ? tealBorder : rowBorder;
+                const cursor = (isWinner && r.url) ? 'pointer' : 'default';
+                const click  = (isWinner && r.url) ? `onclick="window.open('${r.url}','_blank')"` : '';
+                const transition = 'background 0.2s, transform 0.15s, box-shadow 0.15s';
+
+                if (!found) {
+                    return `
+                    <div style="
+                        display:flex; align-items:center; gap:14px;
+                        padding:12px 16px; border-radius:14px;
+                        border:1px dashed ${rowBorder}; background:${rowBg};
+                        opacity:0.45; margin-bottom:0;
+                    ">
+                        <span style="font-size:1.5rem; flex-shrink:0;">${medal}</span>
+                        <div style="flex:1;">
+                            <div style="font-weight:600; font-size:0.9rem; color:${textMain};">${r.name}</div>
+                            <div style="font-size:0.75rem; color:${textMuted}; margin-top:2px;">Not found</div>
+                        </div>
+                        <div style="font-size:0.85rem; color:${textMuted}; font-style:italic;">N/A</div>
+                    </div>`;
+                }
+
+                const prodShort = r.product_name && r.product_name.length > 38
+                    ? r.product_name.substring(0, 35) + '…'
+                    : (r.product_name || '');
+
+                const quantityInfo = r.quantity && r.quantity !== 'N/A' 
+                    ? `<div style="font-size:0.7rem; color:${teal}; margin-top:2px; font-weight:600;">${r.quantity}</div>` 
+                    : '';
+
+                const screenshotBtn = r.screenshot_url ? `
+                    <div onclick="event.stopPropagation(); window.open('${r.screenshot_url}','_blank')" style="
+                        display:inline-flex; align-items:center; gap:4px;
+                        margin-top:4px; font-size:0.65rem; font-weight:600;
+                        color:${textMuted}; cursor:pointer; opacity:0.8;
+                    ">
+                        <i class="fa-solid fa-camera"></i> Live Screenshot
+                    </div>` : '';
+
+                const viewBtn = (isWinner && r.url) ? `
+                    <div style="
+                        display:inline-flex; align-items:center; gap:5px;
+                        margin-top:5px; font-size:0.72rem; font-weight:700;
+                        color:${teal}; letter-spacing:0.02em; text-transform:uppercase;
+                    ">
+                        <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.65rem;"></i>
+                        View Deal
+                    </div>` : '';
+
+                const winnerAccent = isWinner ? `
+                    <div style="
+                        font-size:0.65rem; font-weight:700; text-transform:uppercase;
+                        letter-spacing:0.06em; color:${teal}; margin-bottom:2px;
+                    ">Best Price</div>` : '';
+
+                return `
+                <div ${click} style="
+                    display:flex; align-items:center; gap:14px;
+                    padding:14px 16px; border-radius:14px;
+                    border:1px solid ${border}; background:${bg};
+                    cursor:${cursor}; transition:${transition};
+                    position:relative; overflow:hidden;
+                    ${isWinner ? `box-shadow:0 2px 12px rgba(13,148,136,0.12);` : ''}
+                "
+                ${isWinner ? `onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(13,148,136,0.2)'"
+                               onmouseout="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(13,148,136,0.12)'"` : ''}>
+                    ${isWinner ? `<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${teal},transparent);opacity:0.7;"></div>` : ''}
+                    <span style="font-size:1.6rem; flex-shrink:0; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.15));">${medal}</span>
+                    <div style="flex:1; min-width:0; direction:rtl; text-align:right;">
+                        ${winnerAccent}
+                        <div style="font-weight:700; font-size:0.95rem; color:${textMain};">${r.name}</div>
+                        <div style="font-size:0.75rem; color:${textMuted}; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${prodShort}</div>
+                        ${quantityInfo}
+                        ${screenshotBtn}
+                        ${viewBtn}
+                    </div>
+                    <div style="text-align:right; flex-shrink:0;">
+                        <div style="font-size:1.4rem; font-weight:800; color:${isWinner ? teal : textMain}; font-variant-numeric:tabular-nums;">₪${r.price.toFixed(2)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.innerHTML = `
+                <div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>
+                <div class="message ai-msg" style="padding:0; background:transparent; box-shadow:none; border:none; max-width:440px; width:100%;">
+                    <div style="
+                        background:${cardBg}; border:1px solid ${rowBorder};
+                        border-radius:20px; overflow:hidden;
+                        box-shadow:0 8px 32px rgba(0,0,0,${isDark ? '0.3' : '0.08'});
+                        font-family:'Inter',sans-serif; margin-top:8px;
+                    ">
+                        <!-- Header -->
+                        <div style="
+                            background:linear-gradient(135deg,#0d9488 0%,#0891b2 100%);
+                            padding:16px 20px; display:flex; align-items:center; gap:14px;
+                        ">
+                            <div style="
+                                width:40px; height:40px; border-radius:12px;
+                                background:rgba(255,255,255,0.18); display:flex;
+                                align-items:center; justify-content:center;
+                                font-size:1.2rem; color:white; flex-shrink:0;
+                                border:1px solid rgba(255,255,255,0.2);
+                            "><i class="fa-solid fa-pills"></i></div>
+                            <div>
+                                <div style="color:white; font-weight:700; font-size:1rem;">Price Comparison</div>
+                                <div style="color:rgba(255,255,255,0.78); font-size:0.78rem; margin-top:1px; direction:rtl;">${results.med_name}</div>
+                            </div>
+                        </div>
+                        <!-- Rows -->
+                        <div style="padding:14px; display:flex; flex-direction:column; gap:10px;">
+                            ${rowsHtml}
+                        </div>
+                        <!-- Footer -->
+                        <div style="
+                            padding:10px 20px 14px; text-align:center;
+                            border-top:1px solid ${rowBorder};
+                            font-size:0.72rem; color:${textMuted};
+                            display:flex; align-items:center; justify-content:center; gap:7px;
+                        ">
+                            <i class="fa-solid fa-shield-halved" style="color:${teal}; opacity:0.8;"></i>
+                            Real-time prices · Click 🥇 to buy
+                        </div>
+                    </div>
+                </div>`;
+
+            chatBox.appendChild(wrapper);
+            scrollToBottom();
+        }
+
 
         function appendMessage(text, sender) {
             const wrapper = document.createElement('div');
@@ -1087,10 +1467,21 @@
                 : `<div class="avatar ai-avatar"><i class="fa-solid fa-stethoscope"></i></div>`;
 
             const msgClass = sender === 'user' ? 'user-msg' : 'ai-msg';
+            
+            let htmlContent = text;
+            if (sender === 'ai' || sender === 'assistant') {
+                // Parse markdown if it's from AI
+                htmlContent = marked.parse(text);
+                
+                // Wrap pharmacy results in a special card
+                if (text.includes('### 💊 Best Deal Found!')) {
+                    htmlContent = `<div class="pharmacy-card">${htmlContent}</div>`;
+                }
+            }
 
             wrapper.innerHTML = `
                 ${avatarHtml}
-                <div class="message ${msgClass}">${text}</div>
+                <div class="message ${msgClass}">${htmlContent}</div>
             `;
 
             chatBox.appendChild(wrapper);
@@ -1277,14 +1668,20 @@
 
                             const msgClass = msg.role === 'user' ? 'user-msg' : 'ai-msg';
 
-                            let content = msg.content;
-                            if (typeof content === 'string') {
-                                content = content.replace(/\\n/g, '<br>');
+                            let htmlContent = msg.content;
+                            if (msg.role !== 'user') {
+                                // Parse markdown if it's from AI
+                                htmlContent = marked.parse(msg.content);
+                                
+                                // Wrap pharmacy results in a special card
+                                if (msg.content.includes('### 💊 Best Deal Found!')) {
+                                    htmlContent = `<div class="pharmacy-card">${htmlContent}</div>`;
+                                }
                             }
 
                             wrapper.innerHTML = `
                                 ${avatarHtml}
-                                <div class="message ${msgClass}">${content}</div>
+                                <div class="message ${msgClass}">${htmlContent}</div>
                             `;
                             messagesDiv.appendChild(wrapper);
                         });
