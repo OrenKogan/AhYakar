@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AhYakar | Vision Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0ea5e9;
+            --primary-glow: rgba(14, 165, 233, 0.5);
+            --bg-color: #020617;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.1) 0%, transparent 50%);
+        }
+
+        /* Sidebar / Info Panel */
+        .sidebar {
+            width: 80px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 0;
+            gap: 30px;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary);
+            background: rgba(14, 165, 233, 0.1);
+            border-color: rgba(14, 165, 233, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Main Layout */
+        .app-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Vision Section */
+        .vision-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .vision-card {
+            flex: 1;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #webcam {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            border: 2px solid transparent;
+            z-index: 10;
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            box-shadow: 0 0 15px var(--primary);
+            animation: scan 3s ease-in-out infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes scan {
+            0%, 100% { top: 10%; }
+            50% { top: 90%; }
+        }
+
+        .vision-status {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            z-index: 20;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Controls */
+        .controls-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .mic-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--primary-glow);
+            position: relative;
+        }
+
+        .mic-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .mic-btn.active {
+            background: var(--accent);
+            animation: record-pulse 1.5s infinite;
+        }
+
+        @keyframes record-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
+            70% { box-shadow: 0 0 0 20px rgba(244, 63, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+        }
+
+        /* Chat Section */
+        .chat-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .chat-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-box::-webkit-scrollbar { width: 4px; }
+        .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 85%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-wrapper.user { align-self: flex-end; }
+        .message-wrapper.ai { align-self: flex-start; }
+
+        .message {
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .user .message {
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai .message {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .user .message-time { text-align: right; }
+
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-area input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 12px 15px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-area input:focus {
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        /* Transcription Preview */
+        .transcription-overlay {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            max-width: 80%;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--primary);
+            display: none;
+            z-index: 30;
+        }
+
+        /* Loading States */
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 10px 15px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Recognition UI */
+        .voice-feedback {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            height: 20px;
+        }
+        
+        .bar {
+            width: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+
+        /* Capture Preview */
+        .capture-flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            opacity: 0;
+            z-index: 50;
+            pointer-events: none;
+        }
+
+        .flash-anim {
+            animation: flash 0.5s ease-out;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo"><i class="fa-solid fa-hand-holding-medical"></i></div>
+        <div class="nav-item active" title="Vision AI"><i class="fa-solid fa-eye"></i></div>
+        <div class="nav-item" title="Chat History" onclick="window.location.href='/'"><i class="fa-solid fa-message"></i></div>
+        <div class="nav-item" title="Profile"><i class="fa-solid fa-user-doctor"></i></div>
+        <div style="flex: 1;"></div>
+        <div class="nav-item" title="Settings"><i class="fa-solid fa-gear"></i></div>
+    </aside>
+
+    <div class="app-container">
+        <div class="vision-section">
+            <div class="vision-card">
+                <div class="vision-status">
+                    <div class="status-dot"></div>
+                    LIVE DIAGNOSTIC FEED
+                </div>
+                <video id="webcam" autoplay playsinline></video>
+                <div class="scanner-overlay">
+                    <div class="scanner-line"></div>
+                </div>
+                <div class="transcription-overlay" id="transcription">
+                    Listening...
+                </div>
+                <div class="capture-flash" id="flash"></div>
+                <canvas id="captureCanvas" style="display: none;"></canvas>
+            </div>
+
+            <div class="controls-card">
+                <div class="voice-feedback" id="voiceVisualizer">
+                    <div class="bar" style="height: 10px;"></div>
+                    <div class="bar" style="height: 20px;"></div>
+                    <div class="bar" style="height: 15px;"></div>
+                    <div class="bar" style="height: 25px;"></div>
+                    <div class="bar" style="height: 10px;"></div>
+                </div>
+                <button class="mic-btn" id="micBtn" onclick="toggleListening()">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div style="text-align: center;">
+                    <div style="font-weight: 600; font-size: 0.9rem;">Voice Assistant</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Tap to speak symptoms</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2>Clinical Analysis</h2>
+                <div style="display: flex; gap: 10px; color: var(--text-muted);">
+                    <i class="fa-solid fa-shield-halved" title="Secure Encryption"></i>
+                    <i class="fa-solid fa-circle-info"></i>
+                </div>
+            </div>
+            <div class="chat-box" id="chatBox">
+                <div class="message-wrapper ai">
+                    <div class="message">
+                        Hello! I am your AhYakar Vision Assistant. I can see you and listen to your concerns. <br><br>
+                        <strong>How are you feeling today?</strong> You can describe your symptoms or just show me what's bothering you.
+                    </div>
+                    <div class="message-time">Just now</div>
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendText()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const canvas = document.getElementById('captureCanvas');
+        const micBtn = document.getElementById('micBtn');
+        const transcriptionBox = document.getElementById('transcription');
+        const chatBox = document.getElementById('chatBox');
+        const userInput = document.getElementById('userInput');
+        const flash = document.getElementById('flash');
+
+        let isListening = false;
+        let recognition = null;
+        let stream = null;
+        let sessionId = 'webcam_' + Date.now();
+        let userProfile = JSON.parse(localStorage.getItem('ahyakar_user') || '{"id":"guest","name":"User"}');
+
+        // Initialize Webcam
+        async function initWebcam() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                video.srcObject = stream;
+            } catch (err) {
+                console.error("Webcam Error:", err);
+                appendMessage("system", "Unable to access webcam. Please check permissions.");
+            }
+        }
+
+        // Initialize Speech Recognition
+        function initSpeech() {
+            window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (window.SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    micBtn.classList.add('active');
+                    transcriptionBox.style.display = 'block';
+                    transcriptionBox.textContent = "Listening...";
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0])
+                        .map(result => result.transcript)
+                        .join('');
+                    transcriptionBox.textContent = transcript;
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    micBtn.classList.remove('active');
+                    setTimeout(() => {
+                        const finalTranscript = transcriptionBox.textContent;
+                        if (finalTranscript && finalTranscript !== "Listening...") {
+                            processInput(finalTranscript);
+                        }
+                        transcriptionBox.style.display = 'none';
+                    }, 500);
+                };
+
+                recognition.onerror = (event) => {
+                    console.error("Speech Error:", event.error);
+                    stopListening();
+                };
+            }
+        }
+
+        function toggleListening() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            if (recognition) {
+                try {
+                    recognition.start();
+                } catch(e) { console.error(e); }
+            } else {
+                appendMessage("system", "Speech recognition not supported in this browser.");
+            }
+        }
+
+        function stopListening() {
+            if (recognition) recognition.stop();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendText();
+        }
+
+        function sendText() {
+            const text = userInput.value.trim();
+            if (text) {
+                userInput.value = '';
+                processInput(text);
+            }
+        }
+
+        async function processInput(text) {
+            appendMessage("user", text);
+            const typingId = appendTyping();
+            
+            // Capture image from webcam
+            const imageData = captureFrame();
+            
+            // Visual Flash
+            flash.classList.add('flash-anim');
+            setTimeout(() => flash.classList.remove('flash-anim'), 500);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        userId: userProfile.id,
+                        sessionId: sessionId,
+                        imageData: imageData
+                    })
+                });
+
+                const data = await response.json();
+                removeTyping(typingId);
+
+                if (data.reply) {
+                    appendMessage("ai", data.reply);
+                }
+
+                if (data.requires_confirm) {
+                    appendConfirmButtons(
+                        data.proposal || null,
+                        () => handleConfirm(true),
+                        () => handleConfirm(false)
+                    );
+                } else if (data.error) {
+                    appendMessage("ai", "Sorry, I encountered an error: " + data.error);
+                }
+            } catch (err) {
+                removeTyping(typingId);
+                appendMessage("ai", "Connection error. Please try again.");
+            }
+        }
+
+        function appendConfirmButtons(proposalText, onConfirm, onDecline) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.id = 'confirmWrapper';
+            wrapper.style.maxWidth = '100%';
+
+            const cardHtml = `
+                <div class="message" style="width: 100%; border: 1px solid var(--primary); background: rgba(14, 165, 233, 0.05); padding: 20px; border-radius: 20px;">
+                    ${proposalText ? `<div style="margin-bottom: 15px; font-size: 0.95rem;">${proposalText.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove(); document.getElementById('confirm_yes_trigger').click();" 
+                                style="flex: 1; padding: 10px; border-radius: 12px; background: var(--primary); border: none; color: white; font-weight: 600; cursor: pointer;">
+                            Book Appointment
+                        </button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove(); document.getElementById('confirm_no_trigger').click();"
+                                style="flex: 1; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: white; cursor: pointer;">
+                            Not Now
+                        </button>
+                    </div>
+                </div>
+                <button id="confirm_yes_trigger" style="display:none"></button>
+                <button id="confirm_no_trigger" style="display:none"></button>
+            `;
+            wrapper.innerHTML = cardHtml;
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            document.getElementById('confirm_yes_trigger').onclick = onConfirm;
+            document.getElementById('confirm_no_trigger').onclick = onDecline;
+        }
+
+        async function handleConfirm(confirmed) {
+            const text = confirmed ? 'Yes, please book the appointment.' : 'No, thank you.';
+            appendMessage("user", text);
+            const typingId = appendTyping();
+
+            try {
+                const res = await fetch('/api/confirm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userProfile.id, sessionId: sessionId, confirmed }),
+                });
+                const data = await res.json();
+                removeTyping(typingId);
+
+                if (data.reply) {
+                    appendMessage("ai", data.reply);
+                }
+            } catch (err) {
+                removeTyping(typingId);
+                appendMessage("ai", "Booking error. Please try again later.");
+            }
+        }
+
+        function captureFrame() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            return canvas.toDataURL('image/jpeg').split(',')[1];
+        }
+
+        function appendMessage(sender, text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            wrapper.innerHTML = `
+                <div class="message">${text.replace(/\n/g, '<br>')}</div>
+                <div class="message-time">${time}</div>
+            `;
+            
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendTyping() {
+            const id = 'typing_' + Date.now();
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper ai';
+            wrapper.id = id;
+            wrapper.innerHTML = `
+                <div class="typing">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            chatBox.appendChild(wrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return id;
+        }
+
+        function removeTyping(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        // Simple visualizer effect
+        setInterval(() => {
+            if (isListening) {
+                document.querySelectorAll('.bar').forEach(bar => {
+                    bar.style.height = (Math.random() * 30 + 5) + 'px';
+                });
+            } else {
+                document.querySelectorAll('.bar').forEach((bar, i) => {
+                    bar.style.height = [10, 20, 15, 25, 10][i] + 'px';
+                });
+            }
+        }, 100);
+
+        initWebcam();
+        initSpeech();
+    </script>
+</body>
+</html>

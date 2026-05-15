@@ -31,7 +31,9 @@ DECISION CRITERIA:
 - "no_symptoms"  — the message contains no health complaint (greeting, general question, etc.)
 
 VISION INSTRUCTIONS:
-If the user provides an image, analyze it for visible signs (rash, swelling, discoloration, wounds). Describe these signs in your reasoning and include them in the 'symptoms' list.
+If the user provides an image, analyze it for visible signs (rash, swelling, discoloration, wounds). 
+Additionally, if the image appears to be a webcam capture of the user, assess their "condition": do they look pained, lethargic, pale, or distressed? 
+Describe these signs in your reasoning and include them in the 'symptoms' list (e.g., "appears pale", "visible distress").
 
 You MUST respond with ONLY a valid JSON object — no markdown, no explanation:
 {

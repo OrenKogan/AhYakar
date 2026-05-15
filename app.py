@@ -131,6 +131,12 @@ def home():
     return render_template("index.html")
 
 
+@app.route("/webcam")
+def webcam_mode():
+    """Serve the webcam-enabled version of the UI."""
+    return render_template("webcam.html")
+
+
 @app.route("/api/chat", methods=["POST"])
 def chat():
     """Main pipeline endpoint."""

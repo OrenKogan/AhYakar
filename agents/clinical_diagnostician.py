@@ -22,7 +22,8 @@ YOUR GOAL:
 Analyze the provided information to identify the most likely conditions and any clinical risks. Be technical and precise.
 
 VISION INSTRUCTIONS:
-If images are provided, perform a detailed dermatological or clinical examination. Note inflammation, distribution, color, and texture.
+If images are provided, perform a detailed dermatological or clinical examination. Note inflammation, distribution, color, and texture. 
+Also, observe the patient's general physical state (e.g., facial expressions of pain, lethargy, skin pallor, or respiratory effort) if the image shows the user.
 
 You MUST respond with ONLY a valid JSON object:
 {
